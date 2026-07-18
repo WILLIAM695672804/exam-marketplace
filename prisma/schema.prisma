@@ -1,0 +1,539 @@
+// ============================================
+// Prisma Schema - Exam Marketplace Platform
+// Version 2.0 (Finale)
+// ============================================
+
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// ============================================
+// ENUMS
+// ============================================
+
+enum RoleName {
+  BUYER
+  TEACHER
+  ADMIN
+}
+
+enum TeacherRequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum ExamPaperStatus {
+  DRAFT
+  PUBLISHED
+  MASKED
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  CANCELLED
+  EXPIRED
+}
+
+enum TransactionStatus {
+  INITIATED
+  SUCCESS
+  FAILED
+  EXPIRED
+}
+
+enum NotificationType {
+  PAYMENT
+  VALIDATION
+  REJECTION
+  SYSTEM
+}
+
+enum NotificationChannel {
+  IN_APP
+  EMAIL
+}
+
+enum AuditAction {
+  LOGIN
+  LOGOUT
+  CREATE
+  UPDATE
+  DELETE
+  DOWNLOAD
+  PAYMENT
+  ROLE_CHANGE
+  MASK
+  UNMASK
+}
+
+enum StorageProvider {
+  LOCAL
+  S3
+  R2
+}
+
+enum PaymentProvider {
+  NOTCHPAY
+  CAMPAY
+  STRIPE
+  PAYPAL
+}
+
+// ============================================
+// AUTH.JS MODELS
+// ============================================
+
+model User {
+  id            String    @id @default(uuid())
+  firstName     String
+  lastName      String
+  email         String    @unique
+  passwordHash  String
+  phone         String?
+  avatarFileId  String?   // référence vers File (uniformisation)
+  isActive      Boolean   @default(true)
+  emailVerified DateTime?
+  lastLoginAt   DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime?
+
+  // Auth.js relations
+  accounts      Account[]
+  sessions      Session[]
+
+  // Avatar (fichier)
+  avatarFile    File?     @relation("UserAvatar", fields: [avatarFileId], references: [id])
+
+  // Rôles
+  userRoles     UserRoleOnRole[]
+
+  // Relations métier
+  teacherRequest      TeacherRequest?
+  publishedExams      ExamPaper[]          @relation("AuthorExams")
+  orders              Order[]
+  cartItems           CartItem[]
+  downloads           Download[]
+  notifications       Notification[]
+  auditLogs           AuditLog[]           @relation("UserAuditLogs")
+  reviewedRequests    TeacherRequest[]     @relation("ReviewerRequests")
+
+  @@index([email])
+  @@index([isActive])
+  @@index([createdAt])
+  @@map("users")
+}
+
+model Account {
+  id                String  @id @default(uuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(uuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+// ============================================
+// 1. GESTION DES UTILISATEURS ET RÔLES
+// ============================================
+
+model Role {
+  id          String   @id @default(uuid())
+  name        RoleName @unique
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  userRoles   UserRoleOnRole[]
+
+  @@index([name])
+  @@map("roles")
+}
+
+model UserRoleOnRole {
+  userId     String
+  roleId     String
+  assignedAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@id([userId, roleId])
+  @@index([userId])
+  @@index([roleId])
+  @@map("user_roles")
+}
+
+model TeacherRequest {
+  id              String               @id @default(uuid())
+  userId          String               @unique
+  status          TeacherRequestStatus @default(PENDING)
+  rejectionReason String?              // renommé de reason à rejectionReason
+  documentFileId  String?              // justificatif (optionnel)
+  reviewedBy      String?
+  reviewedAt      DateTime?
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
+
+  user         User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reviewer     User? @relation("ReviewerRequests", fields: [reviewedBy], references: [id])
+  documentFile File? @relation("TeacherRequestDocument", fields: [documentFileId], references: [id])
+
+  @@index([userId])
+  @@index([status])
+  @@map("teacher_requests")
+}
+
+// ============================================
+// 2. CATALOGUE
+// ============================================
+
+model Category {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  slug        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  deletedAt   DateTime?
+
+  competitions Competition[]
+
+  @@index([slug])
+  @@map("categories")
+}
+
+model Competition {
+  id         String   @id @default(uuid())
+  name       String
+  slug       String   @unique
+  organisme  String?
+  categoryId String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  deletedAt  DateTime?
+
+  category   Category     @relation(fields: [categoryId], references: [id])
+  subjects   Subject[]
+  examPapers ExamPaper[]
+
+  @@index([categoryId])
+  @@index([slug])
+  @@map("competitions")
+}
+
+model Subject {
+  id            String   @id @default(uuid())
+  name          String
+  slug          String   @unique
+  competitionId String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  deletedAt     DateTime?
+
+  competition Competition  @relation(fields: [competitionId], references: [id])
+  examPapers  ExamPaper[]
+
+  @@index([competitionId])
+  @@index([slug])
+  @@map("subjects")
+}
+
+model File {
+  id              String          @id @default(uuid())
+  url             String
+  path            String
+  originalName    String?
+  mimeType        String?
+  size            BigInt?
+  checksum        String?
+  storageProvider StorageProvider @default(LOCAL)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  deletedAt       DateTime?
+
+  // relations vers les entités qui utilisent ce fichier
+  paperExams       ExamPaper[]     @relation("PaperFile")
+  correctionExams  ExamPaper[]     @relation("CorrectionFile")
+  teacherRequests  TeacherRequest[] @relation("TeacherRequestDocument")
+  userAvatars      User[]         @relation("UserAvatar")
+
+  @@map("files")
+}
+
+model ExamPaper {
+  id                String          @id @default(uuid())
+  title             String
+  slug              String          @unique
+  year              Int
+  price             Decimal         @db.Decimal(10,2)
+  priceWithCorrection Decimal?       @db.Decimal(10,2)
+  status            ExamPaperStatus @default(PUBLISHED)
+  authorId          String
+  competitionId     String
+  subjectId         String
+  paperFileId       String
+  correctionFileId  String?
+  publishedAt       DateTime?
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  deletedAt         DateTime?
+
+  author        User        @relation("AuthorExams", fields: [authorId], references: [id])
+  competition   Competition @relation(fields: [competitionId], references: [id])
+  subject       Subject     @relation(fields: [subjectId], references: [id])
+  paperFile     File        @relation("PaperFile", fields: [paperFileId], references: [id])
+  correctionFile File?       @relation("CorrectionFile", fields: [correctionFileId], references: [id])
+
+  cartItems    CartItem[]
+  orderItems   OrderItem[]
+
+  @@index([authorId])
+  @@index([competitionId])
+  @@index([subjectId])
+  @@index([status])
+  @@index([year])
+  @@index([slug])
+  @@index([paperFileId])
+  @@index([correctionFileId])
+  @@map("exam_papers")
+}
+
+model Review {
+  id          String   @id @default(uuid())
+  orderItemId String   @unique
+  rating      Int      // doit être compris entre 1 et 5 (validation applicative)
+  comment     String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  orderItem OrderItem @relation(fields: [orderItemId], references: [id], onDelete: Cascade)
+
+  @@index([orderItemId])
+  @@map("reviews")
+}
+
+// ============================================
+// 3. PANIER
+// ============================================
+
+model CartItem {
+  id             String   @id @default(uuid())
+  userId         String
+  examPaperId    String
+  withCorrection Boolean  @default(false)
+  createdAt      DateTime @default(now())
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  examPaper ExamPaper @relation(fields: [examPaperId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, examPaperId])
+  @@index([userId])
+  @@index([examPaperId])
+  @@map("cart_items")
+}
+
+// ============================================
+// 4. COMMANDES
+// ============================================
+
+model Order {
+  id          String      @id @default(uuid())
+  number      String      @unique
+  userId      String
+  totalAmount Decimal     @db.Decimal(10,2)
+  status      OrderStatus @default(PENDING)
+  paidAt      DateTime?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  user         User          @relation(fields: [userId], references: [id])
+  items        OrderItem[]
+  transactions Transaction[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([number])
+  @@map("orders")
+}
+
+model OrderItem {
+  id             String  @id @default(uuid())
+  orderId        String
+  examPaperId    String
+  price          Decimal @db.Decimal(10,2)
+  withCorrection Boolean @default(false)
+  titleSnapshot  String  // titre de l'épreuve au moment de l'achat
+  yearSnapshot   Int     // année au moment de l'achat
+  authorSnapshot String  // nom de l'auteur au moment de l'achat
+  createdAt      DateTime @default(now())
+
+  order     Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  examPaper ExamPaper @relation(fields: [examPaperId], references: [id])
+
+  review    Review?
+  downloads Download[]
+
+  @@index([orderId])
+  @@index([examPaperId])
+  @@map("order_items")
+}
+
+// ============================================
+// 5. PAIEMENTS
+// ============================================
+
+model Transaction {
+  id           String            @id @default(uuid())
+  orderId      String
+  provider     PaymentProvider   @default(NOTCHPAY)
+  reference    String?
+  amount       Decimal           @db.Decimal(10,2)
+  status       TransactionStatus @default(INITIATED)
+  callbackData Json?
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+
+  order      Order       @relation(fields: [orderId], references: [id])
+  commission Commission?
+
+  @@index([orderId])
+  @@index([status])
+  @@index([provider])
+  @@map("transactions")
+}
+
+model Commission {
+  id              String   @id @default(uuid())
+  transactionId   String   @unique
+  rate            Decimal  @db.Decimal(5,2) // taux appliqué au moment du paiement
+  platformAmount  Decimal  @db.Decimal(10,2)
+  teacherAmount   Decimal  @db.Decimal(10,2)
+  createdAt       DateTime @default(now())
+
+  transaction Transaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+
+  @@index([transactionId])
+  @@map("commissions")
+}
+
+// ============================================
+// 6. TÉLÉCHARGEMENTS
+// ============================================
+
+model Download {
+  id          String   @id @default(uuid())
+  orderItemId String
+  userId      String
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime @default(now())
+
+  orderItem OrderItem @relation(fields: [orderItemId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id])
+
+  @@index([orderItemId])
+  @@index([userId])
+  @@index([createdAt]) // pour statistiques
+  @@map("downloads")
+}
+
+// ============================================
+// 7. NOTIFICATIONS
+// ============================================
+
+model Notification {
+  id            String              @id @default(uuid())
+  userId        String
+  type          NotificationType
+  channel       NotificationChannel @default(IN_APP)
+  subject       String
+  content       String
+  read          Boolean             @default(false)
+  sentAt        DateTime?
+  failedAt      DateTime?
+  failureReason String?
+  createdAt     DateTime            @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([type])
+  @@index([channel])
+  @@index([read])
+  @@map("notifications")
+}
+
+// ============================================
+// 8. ADMINISTRATION
+// ============================================
+
+model Setting {
+  id        String   @id @default(uuid())
+  key       String   @unique
+  value     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([key])
+  @@map("settings")
+}
+
+model AuditLog {
+  id         String      @id @default(uuid())
+  userId     String?
+  action     AuditAction
+  resource   String?
+  resourceId String?
+  ipAddress  String?
+  userAgent  String?
+  details    Json?
+  createdAt  DateTime    @default(now())
+
+  user User? @relation("UserAuditLogs", fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([action])
+  @@index([resource, resourceId])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
