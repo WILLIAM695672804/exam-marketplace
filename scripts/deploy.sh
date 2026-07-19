@@ -4,7 +4,9 @@ set -Eeuo pipefail
 IFS=$'\n\t'
 
 # Activer l'environnement Node.js de LWS
+set +u
 source ~/nodevenv/exam-marketplace/22/bin/activate
+set -u
 
 # -------------------------------------------------------------------
 # RÉPERTOIRE DU SCRIPT (permet de trouver l'archive où qu'on soit)
