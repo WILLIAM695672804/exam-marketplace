@@ -6,8 +6,6 @@
 .env.*
 !.env.example
 
-node_modules
-
 .next/cache
 
 coverage

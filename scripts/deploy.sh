@@ -125,10 +125,9 @@ extract_archive() {
 }
 
 # -------------------------------------------------------------------
-# INSTALLATION DES DÉPENDANCES DE PRODUCTION
+# VÉRIFICATION DES ARTEFACTS
 # -------------------------------------------------------------------
-install_dependencies() {
-    log "Installation des dépendances de production"
+check_artifacts() {
     cd "$TMP_DIR"
 
     if [ ! -f package.json ]; then
@@ -136,76 +135,35 @@ install_dependencies() {
         exit 1
     fi
 
-    if [ ! -f package-lock.json ]; then
-        error "package-lock.json introuvable dans l'archive"
+    if [ ! -d node_modules ]; then
+        error "node_modules introuvable dans l'archive"
         exit 1
     fi
 
-    npm ci --omit=dev --prefer-offline --no-audit --no-fund --ignore-scripts
-
-    if [ ! -d node_modules ]; then
-        error "Échec de l'installation des dépendances (node_modules absent)"
+    if [ ! -d .next ]; then
+        error ".next introuvable dans l'archive"
         exit 1
     fi
 }
 
 # -------------------------------------------------------------------
-# GÉNÉRATION DU CLIENT PRISMA ET MIGRATIONS
+# MIGRATIONS PRISMA
 # -------------------------------------------------------------------
-run_prisma() {
-    log "Génération du client Prisma"
+run_migrations() {
     cd "$TMP_DIR"
-
-    if [ ! -f prisma/schema.prisma ]; then
-        error "Schéma Prisma introuvable dans l'archive"
-        exit 1
-    fi
-
-    # Vérification que la CLI Prisma est disponible (doit être dans dependencies)
-    if ! npx prisma --version >/dev/null 2>&1; then
-        error "La CLI Prisma n'est pas disponible. Ajoutez 'prisma' dans les dependencies de package.json."
-        exit 1
-    fi
 
     if [ -z "${DATABASE_URL:-}" ]; then
         error "DATABASE_URL n'est pas definie"
         exit 1
     fi
 
-    if [ -z "${AUTH_SECRET:-}" ]; then
-        error "AUTH_SECRET n'est pas definie"
-        exit 1
-    fi
-
     echo "DATABASE_URL chargee : ${DATABASE_URL%%:*}://****"
-
-    npx prisma generate
-
-    if [ ! -d node_modules/.prisma ]; then
-        error "Le client Prisma n'a pas été généré correctement"
-        exit 1
-    fi
 
     if [ -d prisma/migrations ]; then
         log "Application des migrations Prisma"
         npx prisma migrate deploy
     else
         log "Aucune migration trouvée, étape ignorée"
-    fi
-}
-
-# -------------------------------------------------------------------
-# CONSTRUCTION DE NEXT.JS
-# -------------------------------------------------------------------
-build_next() {
-    log "Construction de Next.js"
-    cd "$TMP_DIR"
-
-    npm run build
-
-    if [ ! -d ".next" ]; then
-        error "Le build Next.js a echoue : dossier .next absent"
-        exit 1
     fi
 }
 
@@ -268,9 +226,8 @@ main() {
     create_backup
     rotate_backups
     extract_archive
-    install_dependencies
-    run_prisma
-    build_next
+    check_artifacts
+    run_migrations
     deploy_files
     restart_passenger
     post_cleanup
