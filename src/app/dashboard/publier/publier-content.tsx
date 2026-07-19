@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
-export function PublierContent() {
+export function PublierContent({ isAdmin = false }: { isAdmin?: boolean }) {
   const [hasCorrection, setHasCorrection] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [paperFileId, setPaperFileId] = useState<string | null>(null);
@@ -113,6 +113,23 @@ export function PublierContent() {
               </div>
             </div>
           </div>
+
+          {/* Informations du professeur (admin uniquement) */}
+          {isAdmin && (
+            <div className="space-y-8 pt-8">
+              <h2 className="font-headline-sm text-primary mb-6 border-b border-outline-variant pb-2">I-bis. Professeur ayant remis l&apos;epreuve</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="relative mt-4">
+                  <label className="font-label-caps text-label-caps text-on-surface-variant uppercase" htmlFor="professorName">Nom du professeur</label>
+                  <input className="w-full bg-transparent border-0 border-b border-outline-variant py-2 px-0 text-body-md text-primary placeholder:text-outline focus:ring-0 focus:border-primary transition-colors outline-none" id="professorName" name="professorName" placeholder="Ex: Pr. Kamga" type="text" />
+                </div>
+                <div className="relative mt-4">
+                  <label className="font-label-caps text-label-caps text-on-surface-variant uppercase" htmlFor="professorPhone">Telephone du professeur</label>
+                  <input className="w-full bg-transparent border-0 border-b border-outline-variant py-2 px-0 text-body-md text-primary placeholder:text-outline focus:ring-0 focus:border-primary transition-colors outline-none" id="professorPhone" name="professorPhone" placeholder="Ex: +237 6XX XXX XXX" type="tel" />
+                </div>
+              </div>
+            </div>
+          )}
 
           <div className="space-y-8 pt-8">
             <h2 className="font-headline-sm text-primary mb-6 border-b border-outline-variant pb-2">II. Contenu &amp; Prix</h2>

@@ -313,6 +313,8 @@ model ExamPaper {
   subjectId         String
   paperFileId       String
   correctionFileId  String?
+  professorName     String?
+  professorPhone    String?
   publishedAt       DateTime?
   createdAt         DateTime        @default(now())
   updatedAt         DateTime        @updatedAt

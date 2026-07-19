@@ -2,20 +2,23 @@ import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { prisma } from "@/lib/prisma";
+import { StatsDownloads } from "./stats-downloads";
 
 export default async function StatistiquesPage() {
   const session = await auth();
   if (!session?.user) return null;
 
   const roles: string[] = (session.user as { roles?: string[] }).roles ?? [];
-  if (!roles.includes("ADMIN")) redirect("/dashboard");
+  // Admin et enseignant peuvent voir les stats (admin: tout, enseignant: ses epreuves)
+  if (!roles.includes("ADMIN") && !roles.includes("TEACHER")) redirect("/dashboard");
+  const isAdmin = roles.includes("ADMIN");
 
-  const [totalUsers, totalExams, totalOrders, revenue] = await Promise.all([
+  const [totalUsers, totalExams, totalOrders, revenue, totalDownloads] = await Promise.all([
     prisma.user.count(),
     prisma.examPaper.count({ where: { deletedAt: null } }),
     prisma.order.count(),
     prisma.transaction.aggregate({ where: { status: "SUCCESS" }, _sum: { amount: true } }),
-    prisma.teacherRequest.count({ where: { status: "PENDING" } }),
+    prisma.download.count(),
   ]);
 
   const recentTransactions = await prisma.transaction.findMany({
@@ -32,18 +35,24 @@ export default async function StatistiquesPage() {
           <p className="font-body-md text-body-md text-on-surface-variant max-w-2xl">Apercu des performances et des metriques de la plateforme.</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-gutter mb-12">
           {[
             { label: "Utilisateurs", value: totalUsers },
             { label: "Epreuves", value: totalExams },
             { label: "Commandes", value: totalOrders },
             { label: "Revenu", value: `$${Number(revenue._sum.amount ?? 0).toFixed(0)}` },
+            { label: "Telechargements", value: totalDownloads },
           ].map((stat) => (
             <div key={stat.label} className="border border-outline-variant bg-surface p-6 flex flex-col gap-4">
               <span className="font-label-caps text-label-caps text-on-surface-variant uppercase">{stat.label}</span>
               <div className="font-headline-lg font-headline-lg">{stat.value}</div>
             </div>
           ))}
+        </div>
+
+        {/* Statistiques de telechargement par epreuve avec periodes */}
+        <div className="mb-12">
+          <StatsDownloads />
         </div>
 
         <div className="border border-outline-variant bg-surface-container-lowest overflow-x-auto">

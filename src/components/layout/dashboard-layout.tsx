@@ -28,7 +28,7 @@ const SIDEBAR_LINKS: SidebarLink[] = [
   { label: "Categories", href: "/dashboard/categories", roles: ["ADMIN"] },
   { label: "Concours", href: "/dashboard/concours-admin", roles: ["ADMIN"] },
   { label: "Matieres", href: "/dashboard/matieres-admin", roles: ["ADMIN"] },
-  { label: "Statistiques", href: "/dashboard/statistiques", roles: ["ADMIN"] },
+  { label: "Statistiques", href: "/dashboard/statistiques", roles: ["ADMIN", "TEACHER"] },
   { label: "Parametres", href: "/dashboard/parametres" },
   { label: "Notifications", href: "/dashboard/notifications" },
 ];

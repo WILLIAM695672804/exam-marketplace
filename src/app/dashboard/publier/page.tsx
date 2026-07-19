@@ -7,9 +7,12 @@ export default async function PublierPage() {
   const session = await auth();
   if (!session?.user) redirect("/connexion");
 
+  const roles: string[] = (session.user as { roles?: string[] }).roles ?? [];
+  const isAdmin = roles.includes("ADMIN");
+
   return (
     <DashboardLayout>
-      <PublierContent />
+      <PublierContent isAdmin={isAdmin} />
     </DashboardLayout>
   );
 }

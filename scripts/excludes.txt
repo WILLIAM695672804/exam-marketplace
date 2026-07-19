@@ -1,0 +1,12 @@
+.git
+.github
+.env
+.env.*
+node_modules
+.next/cache
+tmp
+logs
+*.log
+npm-debug.log*
+yarn-error.log*
+.DS_Store

@@ -12,6 +12,8 @@ interface ExamDetail {
   price: number;
   priceWithCorrection: number | null;
   status: string;
+  professorName: string | null;
+  professorPhone: string | null;
   competition: { name: string; category: { name: string; slug: string } };
   subject: { name: string; slug: string };
   author: { firstName: string; lastName: string };
@@ -25,6 +27,7 @@ export default function EpreuveDetailPage() {
 
   const [exam, setExam] = useState<ExamDetail | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [selectedOption, setSelectedOption] = useState<"exam" | "correction">("exam");
 
   useEffect(() => {
@@ -44,6 +47,22 @@ export default function EpreuveDetailPage() {
     }
     load();
   }, [slug]);
+
+  useEffect(() => {
+    async function checkSession() {
+      try {
+        const res = await fetch("/api/auth/session");
+        if (res.ok) {
+          const session = await res.json();
+          const roles: string[] = session?.user?.roles ?? [];
+          setIsAdmin(roles.includes("ADMIN"));
+        }
+      } catch {
+        // Non connecte
+      }
+    }
+    checkSession();
+  }, []);
 
   const price = selectedOption === "correction" && exam?.priceWithCorrection
     ? `$${Number(exam.priceWithCorrection).toFixed(2)}`
@@ -122,6 +141,25 @@ export default function EpreuveDetailPage() {
         <div className="lg:col-span-5">
           <h1 className="font-headline-lg text-primary mb-4">{exam.title}</h1>
           <p className="font-body-md text-on-surface-variant mb-4">Par {exam.author.firstName} {exam.author.lastName}</p>
+
+          {/* Infos professeur (admin uniquement) */}
+          {isAdmin && (exam.professorName || exam.professorPhone) && (
+            <div className="border border-secondary-fixed-dim/50 bg-secondary-fixed/10 p-4 mb-6 space-y-1">
+              <p className="font-label-caps text-label-caps text-on-surface-variant uppercase mb-2">Professeur remettant</p>
+              {exam.professorName && (
+                <p className="font-body-sm text-primary">
+                  <span className="font-label-caps text-[10px] text-on-surface-variant uppercase">Nom :</span>{" "}
+                  {exam.professorName}
+                </p>
+              )}
+              {exam.professorPhone && (
+                <p className="font-body-sm text-primary">
+                  <span className="font-label-caps text-[10px] text-on-surface-variant uppercase">Tel :</span>{" "}
+                  {exam.professorPhone}
+                </p>
+              )}
+            </div>
+          )}
 
           <div className="border border-outline-variant bg-surface-container-lowest p-8 space-y-6">
             <label className="flex items-center justify-between cursor-pointer border-b border-outline-variant pb-4">

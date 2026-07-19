@@ -1,0 +1,105 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: production
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: "22"
+  APP_DIR: "/home/c2834043c/exam-marketplace"
+  BACKUP_DIR: "/home/c2834043c/backups"
+  TMP_DIR: "/home/c2834043c/deploy_tmp"
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run linter (if available)
+        run: npm run lint --if-present
+
+      - name: Run tests (if available)
+        run: npm run test --if-present
+
+      - name: Generate Prisma Client
+        run: npx prisma generate
+
+      - name: Build Next.js
+        run: npm run build
+
+      - name: Verify Next.js build
+        run: test -f .next/BUILD_ID
+
+      - name: Show build size
+        run: du -sh .next
+
+      - name: Create deployment archive
+        run: |
+          # Utilisation du fichier d'exclusions centralisé
+          tar \
+            --exclude-from=scripts/archive-excludes.txt \
+            -czf deploy.tar.gz .
+          echo "Archive créée :"
+          ls -lh deploy.tar.gz
+
+      - name: Verify archive integrity
+        run: tar -tzf deploy.tar.gz > /dev/null
+
+      # (Optionnel) Vérification de l’environnement serveur (à décommenter pour le premier déploiement)
+      # - name: Verify server environment
+      #   uses: appleboy/ssh-action@v1.2.0
+      #   with:
+      #     host: ${{ secrets.SSH_HOST }}
+      #     username: ${{ secrets.SSH_USER }}
+      #     key: ${{ secrets.SSH_PRIVATE_KEY }}
+      #     port: ${{ secrets.SSH_PORT }}
+      #     script: |
+      #       node --version
+      #       npm --version
+      #       npx --version
+      #       rsync --version
+
+      - name: Copy files to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          # Les chemins relatifs sont conservés : l’arborescence attendue par deploy.sh sera respectée
+          source: "deploy.tar.gz,scripts/deploy.sh,scripts/rollback.sh"
+          target: "/home/c2834043c/exam-marketplace"
+
+      - name: Execute deploy script
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          envs: APP_DIR,BACKUP_DIR,TMP_DIR
+          script: |
+            cd "$APP_DIR"
+            chmod +x scripts/deploy.sh
+            ./scripts/deploy.sh

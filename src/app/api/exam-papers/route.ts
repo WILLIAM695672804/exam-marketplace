@@ -20,6 +20,8 @@ export async function POST(req: Request) {
     subjectId: formData.get("subjectId") as string,
     paperFileId: formData.get("paperFileId") as string,
     correctionFileId: formData.get("correctionFileId") as string || undefined,
+    professorName: (formData.get("professorName") as string) || undefined,
+    professorPhone: (formData.get("professorPhone") as string) || undefined,
     authorId: session.user.id,
     publishedAt: new Date(),
   };

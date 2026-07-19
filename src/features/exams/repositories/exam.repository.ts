@@ -89,6 +89,8 @@ export const examRepository = {
     subjectId: string;
     paperFileId: string;
     correctionFileId?: string;
+    professorName?: string;
+    professorPhone?: string;
     status?: "DRAFT" | "PUBLISHED";
     publishedAt?: Date;
   }) {
@@ -106,6 +108,8 @@ export const examRepository = {
     subjectId?: string;
     paperFileId?: string;
     correctionFileId?: string;
+    professorName?: string;
+    professorPhone?: string;
     publishedAt?: Date;
   }) {
     return prisma.examPaper.update({ where: { id }, data });
