@@ -169,8 +169,20 @@ run_prisma() {
 
     # Charger les variables d'environnement depuis le .env de production
     if [ -f "$APP_DIR/.env" ]; then
-        export $(grep -v '^\s*#' "$APP_DIR/.env" | xargs)
+        set -a
+        source "$APP_DIR/.env"
+        set +a
+    else
+        error "Fichier .env introuvable : $APP_DIR/.env"
+        exit 1
     fi
+
+    if [ -z "${DATABASE_URL:-}" ]; then
+        error "DATABASE_URL n'est pas definie"
+        exit 1
+    fi
+
+    echo "DATABASE_URL chargee : ${DATABASE_URL%%:*}://****"
 
     npx prisma generate
 
