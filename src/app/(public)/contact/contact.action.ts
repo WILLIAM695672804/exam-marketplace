@@ -2,7 +2,7 @@
 
 export async function sendContactMessage(
   _prevState: { success: boolean } | null,
-  _formData: FormData,
+  _formData: FormData
 ): Promise<{ success: boolean }> {
   // En production : envoyer un email via Resend
   // const { resend } = await import("@/lib/resend");

@@ -41,7 +41,7 @@ describe("examRepository", () => {
         where: expect.objectContaining({
           OR: expect.arrayContaining([expect.objectContaining({ title: expect.any(Object) })]),
         }),
-      }),
+      })
     );
   });
 
@@ -54,7 +54,7 @@ describe("examRepository", () => {
     expect(prisma.examPaper.findMany).toHaveBeenCalledWith(
       expect.objectContaining({
         where: expect.objectContaining({ status: "PUBLISHED" }),
-      }),
+      })
     );
   });
 
@@ -65,7 +65,7 @@ describe("examRepository", () => {
     const result = await examRepository.findBySlug("test-exam");
 
     expect(prisma.examPaper.findFirst).toHaveBeenCalledWith(
-      expect.objectContaining({ where: { slug: "test-exam", deletedAt: null } }),
+      expect.objectContaining({ where: { slug: "test-exam", deletedAt: null } })
     );
     expect(result).toEqual(mockExam);
   });
@@ -87,7 +87,7 @@ describe("examRepository", () => {
       expect.objectContaining({
         where: { id: "exam1" },
         data: { deletedAt: expect.any(Date) },
-      }),
+      })
     );
   });
 
@@ -97,7 +97,7 @@ describe("examRepository", () => {
     await examRepository.mask("exam1");
 
     expect(prisma.examPaper.update).toHaveBeenCalledWith(
-      expect.objectContaining({ where: { id: "exam1" }, data: { status: "MASKED" } }),
+      expect.objectContaining({ where: { id: "exam1" }, data: { status: "MASKED" } })
     );
   });
 
@@ -107,7 +107,7 @@ describe("examRepository", () => {
     await examRepository.unmask("exam1");
 
     expect(prisma.examPaper.update).toHaveBeenCalledWith(
-      expect.objectContaining({ where: { id: "exam1" }, data: { status: "PUBLISHED" } }),
+      expect.objectContaining({ where: { id: "exam1" }, data: { status: "PUBLISHED" } })
     );
   });
 });

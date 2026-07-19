@@ -8,7 +8,7 @@ import type { AuthResult } from "@/features/auth/actions/auth.actions";
 export default function LoginPage() {
   const [state, formAction, isPending] = useActionState<AuthResult | null, FormData>(
     loginAction,
-    null,
+    null
   );
 
   return (

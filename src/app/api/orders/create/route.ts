@@ -15,7 +15,7 @@ export async function POST() {
   } catch (error) {
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Erreur commande" },
-      { status: 400 },
+      { status: 400 }
     );
   }
 }

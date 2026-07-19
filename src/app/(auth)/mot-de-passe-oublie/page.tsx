@@ -8,7 +8,7 @@ import type { AuthResult } from "@/features/auth/actions/auth.actions";
 export default function MotDePasseOubliePage() {
   const [state, formAction, isPending] = useActionState<AuthResult | null, FormData>(
     forgotPasswordAction,
-    null,
+    null
   );
 
   if (state?.success) {
@@ -20,8 +20,8 @@ export default function MotDePasseOubliePage() {
           </span>
           <h1 className="font-headline-md text-primary mb-3">Email envoye</h1>
           <p className="font-body-sm text-body-sm text-on-surface-variant">
-            Si un compte existe avec cette adresse, vous recevrez un email contenant un lien
-            de reinitialisation. Verifiez vos spams.
+            Si un compte existe avec cette adresse, vous recevrez un email contenant un lien de
+            reinitialisation. Verifiez vos spams.
           </p>
         </div>
         <div className="text-center pt-4">

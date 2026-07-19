@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 
 export async function updateProfileAction(
   _prevState: { success: boolean; error?: string } | null,
-  formData: FormData,
+  formData: FormData
 ): Promise<{ success: boolean; error?: string }> {
   const session = await auth();
   if (!session?.user?.id) return { success: false, error: "Non authentifie" };
@@ -16,7 +16,11 @@ export async function updateProfileAction(
 
   await prisma.user.update({
     where: { id: session.user.id },
-    data: { ...(firstName ? { firstName } : {}), ...(lastName ? { lastName } : {}), ...(phone ? { phone } : {}) },
+    data: {
+      ...(firstName ? { firstName } : {}),
+      ...(lastName ? { lastName } : {}),
+      ...(phone ? { phone } : {}),
+    },
   });
 
   return { success: true };

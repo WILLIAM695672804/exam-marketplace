@@ -30,7 +30,7 @@ describe("cartRepository", () => {
     const result = await cartRepository.findByUser("user1");
 
     expect(prisma.cartItem.findMany).toHaveBeenCalledWith(
-      expect.objectContaining({ where: { userId: "user1" } }),
+      expect.objectContaining({ where: { userId: "user1" } })
     );
     expect(result).toEqual(mockItems);
   });
@@ -44,7 +44,7 @@ describe("cartRepository", () => {
       expect.objectContaining({
         where: { userId_examPaperId: { userId: "user1", examPaperId: "exam1" } },
         create: { userId: "user1", examPaperId: "exam1", withCorrection: true },
-      }),
+      })
     );
   });
 
@@ -56,7 +56,7 @@ describe("cartRepository", () => {
     expect(prisma.cartItem.delete).toHaveBeenCalledWith(
       expect.objectContaining({
         where: { userId_examPaperId: { userId: "user1", examPaperId: "exam1" } },
-      }),
+      })
     );
   });
 
@@ -66,7 +66,7 @@ describe("cartRepository", () => {
     await cartRepository.clear("user1");
 
     expect(prisma.cartItem.deleteMany).toHaveBeenCalledWith(
-      expect.objectContaining({ where: { userId: "user1" } }),
+      expect.objectContaining({ where: { userId: "user1" } })
     );
   });
 

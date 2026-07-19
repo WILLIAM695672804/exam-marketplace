@@ -14,7 +14,9 @@ export default async function CategoriesPage() {
       </div>
 
       {categories.length === 0 ? (
-        <p className="text-center text-on-surface-variant py-20">Aucune categorie pour le moment.</p>
+        <p className="text-center text-on-surface-variant py-20">
+          Aucune categorie pour le moment.
+        </p>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
           {categories.map((cat) => (
@@ -24,8 +26,12 @@ export default async function CategoriesPage() {
               className="group border border-outline-variant bg-surface-container-lowest p-8 hover:border-primary transition-colors duration-300 flex flex-col justify-between h-56"
             >
               <div>
-                <h3 className="font-headline-sm text-primary mb-3 group-hover:text-secondary transition-colors">{cat.name}</h3>
-                <p className="font-body-sm text-body-sm text-on-surface-variant">{cat.description || ""}</p>
+                <h3 className="font-headline-sm text-primary mb-3 group-hover:text-secondary transition-colors">
+                  {cat.name}
+                </h3>
+                <p className="font-body-sm text-body-sm text-on-surface-variant">
+                  {cat.description || ""}
+                </p>
               </div>
               <span className="font-label-caps text-label-caps text-on-surface-variant mt-4">
                 {cat._count.competitions} concours

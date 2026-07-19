@@ -9,11 +9,10 @@ export default function AProposPage() {
             <div>
               <h2 className="font-headline-sm text-primary mb-4">Notre mission</h2>
               <p className="font-body-md text-body-md text-on-surface-variant leading-relaxed">
-                Exam Marketplace democratise l&apos;acces aux epreuves de concours en
-                Afrique. Nous permettons aux candidats de se preparer efficacement
-                en accedant a une vaste bibliotheque d&apos;epreuves authentiques avec
-                leurs corriges, tout en offrant aux enseignants une plateforme pour
-                valoriser leur expertise.
+                Exam Marketplace democratise l&apos;acces aux epreuves de concours en Afrique. Nous
+                permettons aux candidats de se preparer efficacement en accedant a une vaste
+                bibliotheque d&apos;epreuves authentiques avec leurs corriges, tout en offrant aux
+                enseignants une plateforme pour valoriser leur expertise.
               </p>
             </div>
 

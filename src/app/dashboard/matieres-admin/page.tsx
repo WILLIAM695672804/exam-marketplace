@@ -15,7 +15,10 @@ export default async function MatieresAdminPage() {
     include: { competition: true, _count: { select: { examPapers: true } } },
     orderBy: { name: "asc" },
   });
-  const competitions = await prisma.competition.findMany({ where: { deletedAt: null }, orderBy: { name: "asc" } });
+  const competitions = await prisma.competition.findMany({
+    where: { deletedAt: null },
+    orderBy: { name: "asc" },
+  });
 
   return (
     <DashboardLayout>

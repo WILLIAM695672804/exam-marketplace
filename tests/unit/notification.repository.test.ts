@@ -24,7 +24,7 @@ describe("notificationRepository", () => {
     await notificationRepository.findByUser("user1");
 
     expect(prisma.notification.findMany).toHaveBeenCalledWith(
-      expect.objectContaining({ where: { userId: "user1" }, take: 50 }),
+      expect.objectContaining({ where: { userId: "user1" }, take: 50 })
     );
   });
 
@@ -35,7 +35,7 @@ describe("notificationRepository", () => {
 
     expect(result).toBe(3);
     expect(prisma.notification.count).toHaveBeenCalledWith(
-      expect.objectContaining({ where: { userId: "user1", read: false } }),
+      expect.objectContaining({ where: { userId: "user1", read: false } })
     );
   });
 
@@ -48,7 +48,7 @@ describe("notificationRepository", () => {
       expect.objectContaining({
         where: { id: "notif1", userId: "user1" },
         data: { read: true },
-      }),
+      })
     );
   });
 
@@ -61,7 +61,7 @@ describe("notificationRepository", () => {
       expect.objectContaining({
         where: { userId: "user1", read: false },
         data: { read: true },
-      }),
+      })
     );
   });
 });

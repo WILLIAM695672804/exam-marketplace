@@ -36,9 +36,7 @@ describe("notchPayService", () => {
   it("initiatePayment leve une erreur si la commande n'existe pas", async () => {
     vi.mocked(prisma.order.findUnique).mockResolvedValue(null as never);
 
-    await expect(notchPayService.initiatePayment("order1")).rejects.toThrow(
-      "Commande introuvable",
-    );
+    await expect(notchPayService.initiatePayment("order1")).rejects.toThrow("Commande introuvable");
   });
 
   it("initiatePayment leve une erreur si la commande est deja payee", async () => {
@@ -47,7 +45,7 @@ describe("notchPayService", () => {
     } as never);
 
     await expect(notchPayService.initiatePayment("order1")).rejects.toThrow(
-      "Cette commande a deja ete payee",
+      "Cette commande a deja ete payee"
     );
   });
 
@@ -88,7 +86,7 @@ describe("notchPayService", () => {
       expect.objectContaining({
         where: { id: "order1" },
         data: expect.objectContaining({ status: "PAID" }),
-      }),
+      })
     );
   });
 
@@ -111,7 +109,7 @@ describe("notchPayService", () => {
     expect(prisma.order.update).toHaveBeenCalledWith(
       expect.objectContaining({
         data: expect.objectContaining({ status: "CANCELLED" }),
-      }),
+      })
     );
   });
 });

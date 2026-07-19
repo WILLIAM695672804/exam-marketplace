@@ -15,7 +15,7 @@ export async function POST(req: Request) {
   } catch (error) {
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Erreur paiement" },
-      { status: 400 },
+      { status: 400 }
     );
   }
 }

@@ -26,7 +26,7 @@ describe("categoryRepository", () => {
     const result = await categoryRepository.findAll();
 
     expect(prisma.category.findMany).toHaveBeenCalledWith(
-      expect.objectContaining({ where: { deletedAt: null } }),
+      expect.objectContaining({ where: { deletedAt: null } })
     );
     expect(result).toEqual(mockCategories);
   });
@@ -40,7 +40,7 @@ describe("categoryRepository", () => {
       expect.objectContaining({
         where: { slug: "test", deletedAt: null },
         include: expect.objectContaining({ competitions: expect.any(Object) }),
-      }),
+      })
     );
   });
 
@@ -63,7 +63,7 @@ describe("categoryRepository", () => {
       expect.objectContaining({
         where: { id: "cat1" },
         data: { deletedAt: expect.any(Date) },
-      }),
+      })
     );
   });
 });

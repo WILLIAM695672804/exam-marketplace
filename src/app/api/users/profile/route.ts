@@ -12,7 +12,11 @@ export async function PUT(req: Request) {
 
   await prisma.user.update({
     where: { id: session.user.id },
-    data: { ...(firstName ? { firstName } : {}), ...(lastName ? { lastName } : {}), ...(phone !== undefined ? { phone } : {}) },
+    data: {
+      ...(firstName ? { firstName } : {}),
+      ...(lastName ? { lastName } : {}),
+      ...(phone !== undefined ? { phone } : {}),
+    },
   });
 
   return NextResponse.json({ success: true });

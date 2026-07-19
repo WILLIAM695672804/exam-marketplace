@@ -44,7 +44,10 @@ export async function updateExam(id: string, formData: FormData) {
   }
 
   const data = examSchema.partial().parse(Object.fromEntries(formData));
-  return examRepository.update(id, data as Record<string, unknown> as Parameters<typeof examRepository.update>[1]);
+  return examRepository.update(
+    id,
+    data as Record<string, unknown> as Parameters<typeof examRepository.update>[1]
+  );
 }
 
 export async function deleteExam(id: string) {

@@ -15,7 +15,10 @@ export default async function ConcoursAdminPage() {
     include: { category: true, _count: { select: { subjects: true, examPapers: true } } },
     orderBy: { name: "asc" },
   });
-  const categories = await prisma.category.findMany({ where: { deletedAt: null }, orderBy: { name: "asc" } });
+  const categories = await prisma.category.findMany({
+    where: { deletedAt: null },
+    orderBy: { name: "asc" },
+  });
 
   return (
     <DashboardLayout>

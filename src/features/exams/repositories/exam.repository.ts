@@ -15,7 +15,19 @@ export const examRepository = {
     page?: number;
     limit?: number;
   }) {
-    const { search, categoryId, competitionId, subjectId, minPrice, maxPrice, authorId, status, sortBy = "createdAt", page = 1, limit = 20 } = params;
+    const {
+      search,
+      categoryId,
+      competitionId,
+      subjectId,
+      minPrice,
+      maxPrice,
+      authorId,
+      status,
+      sortBy = "createdAt",
+      page = 1,
+      limit = 20,
+    } = params;
 
     const where: Prisma.ExamPaperWhereInput = {
       deletedAt: null,
@@ -25,10 +37,21 @@ export const examRepository = {
       ...(subjectId ? { subjectId } : {}),
       ...(categoryId ? { competition: { categoryId } } : {}),
       ...(minPrice !== undefined || maxPrice !== undefined
-        ? { price: { ...(minPrice !== undefined ? { gte: minPrice } : {}), ...(maxPrice !== undefined ? { lte: maxPrice } : {}) } }
+        ? {
+            price: {
+              ...(minPrice !== undefined ? { gte: minPrice } : {}),
+              ...(maxPrice !== undefined ? { lte: maxPrice } : {}),
+            },
+          }
         : {}),
       ...(search
-        ? { OR: [{ title: { contains: search, mode: "insensitive" } }, { competition: { name: { contains: search, mode: "insensitive" } } }, { subject: { name: { contains: search, mode: "insensitive" } } }] }
+        ? {
+            OR: [
+              { title: { contains: search, mode: "insensitive" } },
+              { competition: { name: { contains: search, mode: "insensitive" } } },
+              { subject: { name: { contains: search, mode: "insensitive" } } },
+            ],
+          }
         : {}),
     };
 
@@ -41,7 +64,14 @@ export const examRepository = {
           author: { select: { id: true, firstName: true, lastName: true } },
           _count: { select: { orderItems: true } },
         },
-        orderBy: sortBy === "price_asc" ? { price: "asc" } : sortBy === "price_desc" ? { price: "desc" } : sortBy === "year" ? { year: "desc" } : { createdAt: "desc" },
+        orderBy:
+          sortBy === "price_asc"
+            ? { price: "asc" }
+            : sortBy === "price_desc"
+              ? { price: "desc" }
+              : sortBy === "year"
+                ? { year: "desc" }
+                : { createdAt: "desc" },
         skip: (page - 1) * limit,
         take: limit,
       }),
@@ -97,21 +127,24 @@ export const examRepository = {
     return prisma.examPaper.create({ data });
   },
 
-  update(id: string, data: {
-    title?: string;
-    slug?: string;
-    year?: number;
-    price?: number;
-    priceWithCorrection?: number;
-    status?: "DRAFT" | "PUBLISHED" | "MASKED";
-    competitionId?: string;
-    subjectId?: string;
-    paperFileId?: string;
-    correctionFileId?: string;
-    professorName?: string;
-    professorPhone?: string;
-    publishedAt?: Date;
-  }) {
+  update(
+    id: string,
+    data: {
+      title?: string;
+      slug?: string;
+      year?: number;
+      price?: number;
+      priceWithCorrection?: number;
+      status?: "DRAFT" | "PUBLISHED" | "MASKED";
+      competitionId?: string;
+      subjectId?: string;
+      paperFileId?: string;
+      correctionFileId?: string;
+      professorName?: string;
+      professorPhone?: string;
+      publishedAt?: Date;
+    }
+  ) {
     return prisma.examPaper.update({ where: { id }, data });
   },
 

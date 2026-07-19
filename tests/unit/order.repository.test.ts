@@ -38,7 +38,7 @@ describe("orderRepository", () => {
     await orderRepository.findByUser("user1");
 
     expect(prisma.order.findMany).toHaveBeenCalledWith(
-      expect.objectContaining({ where: { userId: "user1" } }),
+      expect.objectContaining({ where: { userId: "user1" } })
     );
   });
 
@@ -48,16 +48,14 @@ describe("orderRepository", () => {
     await orderRepository.findByUser("user1", "PAID");
 
     expect(prisma.order.findMany).toHaveBeenCalledWith(
-      expect.objectContaining({ where: { userId: "user1", status: "PAID" } }),
+      expect.objectContaining({ where: { userId: "user1", status: "PAID" } })
     );
   });
 
   it("createFromCart leve une erreur si le panier est vide", async () => {
     vi.mocked(prisma.cartItem.findMany).mockResolvedValue([] as never);
 
-    await expect(orderRepository.createFromCart("user1")).rejects.toThrow(
-      "Le panier est vide",
-    );
+    await expect(orderRepository.createFromCart("user1")).rejects.toThrow("Le panier est vide");
   });
 
   it("createFromCart cree une commande et vide le panier", async () => {
@@ -65,7 +63,12 @@ describe("orderRepository", () => {
       {
         examPaperId: "exam1",
         withCorrection: false,
-        examPaper: { title: "Test", year: 2024, price: { toString: () => "100" }, priceWithCorrection: null },
+        examPaper: {
+          title: "Test",
+          year: 2024,
+          price: { toString: () => "100" },
+          priceWithCorrection: null,
+        },
       },
     ];
 
@@ -77,7 +80,7 @@ describe("orderRepository", () => {
 
     expect(prisma.order.create).toHaveBeenCalled();
     expect(prisma.cartItem.deleteMany).toHaveBeenCalledWith(
-      expect.objectContaining({ where: { userId: "user1" } }),
+      expect.objectContaining({ where: { userId: "user1" } })
     );
     expect(result).toBeDefined();
   });

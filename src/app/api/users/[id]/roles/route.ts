@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 
 function requireAdmin(session: unknown) {
   if (!session) return false;
-  const roles = ((session as { user?: { roles?: string[] } }).user?.roles) ?? [];
+  const roles = (session as { user?: { roles?: string[] } }).user?.roles ?? [];
   return roles.includes("ADMIN");
 }
 

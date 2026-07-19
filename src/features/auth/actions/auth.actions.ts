@@ -3,11 +3,19 @@
 import { redirect } from "next/navigation";
 import { signIn, signOut } from "@/lib/auth";
 import { authService } from "../services/auth.service";
-import { loginSchema, registerSchema, forgotPasswordSchema, resetPasswordSchema } from "../schemas/auth.schema";
+import {
+  loginSchema,
+  registerSchema,
+  forgotPasswordSchema,
+  resetPasswordSchema,
+} from "../schemas/auth.schema";
 
 export type AuthResult = { success: true } | { success: false; error: string };
 
-export async function loginAction(_prevState: AuthResult | null, formData: FormData): Promise<AuthResult> {
+export async function loginAction(
+  _prevState: AuthResult | null,
+  formData: FormData
+): Promise<AuthResult> {
   const parsed = loginSchema.safeParse({
     email: formData.get("email"),
     password: formData.get("password"),
@@ -32,7 +40,10 @@ export async function loginAction(_prevState: AuthResult | null, formData: FormD
   redirect("/dashboard");
 }
 
-export async function registerAction(_prevState: AuthResult | null, formData: FormData): Promise<AuthResult> {
+export async function registerAction(
+  _prevState: AuthResult | null,
+  formData: FormData
+): Promise<AuthResult> {
   const parsed = registerSchema.safeParse({
     firstName: formData.get("firstName"),
     lastName: formData.get("lastName"),
@@ -54,7 +65,10 @@ export async function registerAction(_prevState: AuthResult | null, formData: Fo
   redirect("/connexion");
 }
 
-export async function forgotPasswordAction(_prevState: AuthResult | null, formData: FormData): Promise<AuthResult> {
+export async function forgotPasswordAction(
+  _prevState: AuthResult | null,
+  formData: FormData
+): Promise<AuthResult> {
   const parsed = forgotPasswordSchema.safeParse({
     email: formData.get("email"),
   });
@@ -73,7 +87,10 @@ export async function forgotPasswordAction(_prevState: AuthResult | null, formDa
   return { success: true };
 }
 
-export async function resetPasswordAction(_prevState: AuthResult | null, formData: FormData): Promise<AuthResult> {
+export async function resetPasswordAction(
+  _prevState: AuthResult | null,
+  formData: FormData
+): Promise<AuthResult> {
   const parsed = resetPasswordSchema.safeParse({
     token: formData.get("token"),
     password: formData.get("password"),

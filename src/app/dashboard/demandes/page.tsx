@@ -2,7 +2,10 @@ import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { prisma } from "@/lib/prisma";
-import { approveTeacherRequest, rejectTeacherRequest } from "@/features/teacher/actions/teacher.actions";
+import {
+  approveTeacherRequest,
+  rejectTeacherRequest,
+} from "@/features/teacher/actions/teacher.actions";
 
 export default async function DemandesPage() {
   const session = await auth();
@@ -41,7 +44,10 @@ export default async function DemandesPage() {
             { label: "Approuvees", value: approvedCount, color: "bg-secondary-fixed" },
             { label: "Rejetees", value: rejectedCount, color: "bg-error-container" },
           ].map((stat) => (
-            <div key={stat.label} className={`border border-outline-variant p-6 flex flex-col gap-4 ${stat.color}`}>
+            <div
+              key={stat.label}
+              className={`border border-outline-variant p-6 flex flex-col gap-4 ${stat.color}`}
+            >
               <span className="font-label-caps text-label-caps uppercase">{stat.label}</span>
               <div className="font-headline-lg font-headline-lg">{stat.value}</div>
             </div>
@@ -53,30 +59,71 @@ export default async function DemandesPage() {
             <thead>
               <tr className="border-b border-outline-variant">
                 {["Enseignant", "Email", "Statut", "Date", "Actions"].map((h) => (
-                  <th key={h} className="text-left font-label-caps text-label-caps text-on-surface-variant uppercase px-6 py-4">{h}</th>
+                  <th
+                    key={h}
+                    className="text-left font-label-caps text-label-caps text-on-surface-variant uppercase px-6 py-4"
+                  >
+                    {h}
+                  </th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {requests.map((req) => (
-                <tr key={req.id} className="border-b border-outline-variant/50 hover:bg-surface-container-low transition-colors">
-                  <td className="px-6 py-4 font-body-md text-primary">{req.user.firstName} {req.user.lastName}</td>
-                  <td className="px-6 py-4 font-body-sm text-on-surface-variant">{req.user.email}</td>
+                <tr
+                  key={req.id}
+                  className="border-b border-outline-variant/50 hover:bg-surface-container-low transition-colors"
+                >
+                  <td className="px-6 py-4 font-body-md text-primary">
+                    {req.user.firstName} {req.user.lastName}
+                  </td>
+                  <td className="px-6 py-4 font-body-sm text-on-surface-variant">
+                    {req.user.email}
+                  </td>
                   <td className="px-6 py-4">
-                    <span className={`px-2 py-1 font-label-caps text-[10px] uppercase ${req.status === "PENDING" ? "bg-secondary-container text-on-secondary-container" : req.status === "APPROVED" ? "bg-secondary-fixed text-on-secondary-fixed" : "bg-error-container text-on-error-container"}`}>
-                      {req.status === "PENDING" ? "En attente" : req.status === "APPROVED" ? "Approuvee" : "Rejetee"}
+                    <span
+                      className={`px-2 py-1 font-label-caps text-[10px] uppercase ${req.status === "PENDING" ? "bg-secondary-container text-on-secondary-container" : req.status === "APPROVED" ? "bg-secondary-fixed text-on-secondary-fixed" : "bg-error-container text-on-error-container"}`}
+                    >
+                      {req.status === "PENDING"
+                        ? "En attente"
+                        : req.status === "APPROVED"
+                          ? "Approuvee"
+                          : "Rejetee"}
                     </span>
                   </td>
-                  <td className="px-6 py-4 font-body-sm text-on-surface-variant">{new Date(req.createdAt).toLocaleDateString("fr")}</td>
+                  <td className="px-6 py-4 font-body-sm text-on-surface-variant">
+                    {new Date(req.createdAt).toLocaleDateString("fr")}
+                  </td>
                   <td className="px-6 py-4">
                     {req.status === "PENDING" && (
                       <div className="flex gap-2">
-                        <form action={async () => { "use server"; await approveTeacherRequest(req.id); }}>
-                          <button type="submit" className="px-4 py-2 bg-primary text-on-primary font-label-caps text-label-caps uppercase hover:bg-inverse-surface transition-colors">Approuver</button>
+                        <form
+                          action={async () => {
+                            "use server";
+                            await approveTeacherRequest(req.id);
+                          }}
+                        >
+                          <button
+                            type="submit"
+                            className="px-4 py-2 bg-primary text-on-primary font-label-caps text-label-caps uppercase hover:bg-inverse-surface transition-colors"
+                          >
+                            Approuver
+                          </button>
                         </form>
-                        <form action={async (formData: FormData) => { "use server"; const reason = formData.get("reason") as string || "Non specifiee"; await rejectTeacherRequest(req.id, reason); }}>
+                        <form
+                          action={async (formData: FormData) => {
+                            "use server";
+                            const reason = (formData.get("reason") as string) || "Non specifiee";
+                            await rejectTeacherRequest(req.id, reason);
+                          }}
+                        >
                           <input type="hidden" name="reason" value="" />
-                          <button type="submit" className="px-4 py-2 border border-error text-error font-label-caps text-label-caps uppercase hover:bg-error-container transition-colors">Rejeter</button>
+                          <button
+                            type="submit"
+                            className="px-4 py-2 border border-error text-error font-label-caps text-label-caps uppercase hover:bg-error-container transition-colors"
+                          >
+                            Rejeter
+                          </button>
                         </form>
                       </div>
                     )}

@@ -51,11 +51,7 @@ export async function Header() {
                 Dashboard
               </Link>
               <form action={logout}>
-                <Button
-                  type="submit"
-                  variant="ghost"
-                  className="font-label-caps text-label-caps"
-                >
+                <Button type="submit" variant="ghost" className="font-label-caps text-label-caps">
                   Deconnexion
                 </Button>
               </form>

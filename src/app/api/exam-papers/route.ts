@@ -15,11 +15,13 @@ export async function POST(req: Request) {
     slug: formData.get("slug") as string,
     year: Number(formData.get("year")),
     price: Number(formData.get("price")),
-    priceWithCorrection: formData.get("priceWithCorrection") ? Number(formData.get("priceWithCorrection")) : undefined,
+    priceWithCorrection: formData.get("priceWithCorrection")
+      ? Number(formData.get("priceWithCorrection"))
+      : undefined,
     competitionId: formData.get("competitionId") as string,
     subjectId: formData.get("subjectId") as string,
     paperFileId: formData.get("paperFileId") as string,
-    correctionFileId: formData.get("correctionFileId") as string || undefined,
+    correctionFileId: (formData.get("correctionFileId") as string) || undefined,
     professorName: (formData.get("professorName") as string) || undefined,
     professorPhone: (formData.get("professorPhone") as string) || undefined,
     authorId: session.user.id,

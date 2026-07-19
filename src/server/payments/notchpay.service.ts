@@ -52,7 +52,7 @@ export const notchPayService = {
     const response = await fetch(NOTCHPAY_API_URL, {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${apiKey}`,
+        Authorization: `Bearer ${apiKey}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify(payload),
@@ -79,7 +79,8 @@ export const notchPayService = {
       return;
     }
 
-    const transactionStatus = body.status === "SUCCESS" ? "SUCCESS" : body.status === "EXPIRED" ? "EXPIRED" : "FAILED";
+    const transactionStatus =
+      body.status === "SUCCESS" ? "SUCCESS" : body.status === "EXPIRED" ? "EXPIRED" : "FAILED";
 
     await prisma.transaction.create({
       data: {

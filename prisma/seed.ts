@@ -33,8 +33,7 @@ async function main() {
       update: {},
       create: {
         name: "ADMIN",
-        description:
-          "Administrateur - gère la plateforme, les utilisateurs et les paramètres",
+        description: "Administrateur - gère la plateforme, les utilisateurs et les paramètres",
       },
     }),
   ]);

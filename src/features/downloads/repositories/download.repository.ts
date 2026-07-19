@@ -16,7 +16,12 @@ export const downloadRepository = {
     return orderItem.downloads.length < maxDownloads;
   },
 
-  async recordDownload(userId: string, orderItemId: string, ipAddress?: string, userAgent?: string) {
+  async recordDownload(
+    userId: string,
+    orderItemId: string,
+    ipAddress?: string,
+    userAgent?: string
+  ) {
     return prisma.download.create({
       data: { userId, orderItemId, ipAddress, userAgent },
     });
@@ -28,7 +33,9 @@ export const downloadRepository = {
       include: {
         orderItem: {
           include: {
-            examPaper: { select: { title: true, slug: true, paperFileId: true, correctionFileId: true } },
+            examPaper: {
+              select: { title: true, slug: true, paperFileId: true, correctionFileId: true },
+            },
           },
         },
       },

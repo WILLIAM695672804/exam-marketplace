@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 
 function requireAdmin(session: unknown) {
   if (!session) return false;
-  const roles = ((session as { user?: { roles?: string[] } }).user?.roles) ?? [];
+  const roles = (session as { user?: { roles?: string[] } }).user?.roles ?? [];
   return roles.includes("ADMIN");
 }
 
@@ -17,7 +17,12 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
 
   const user = await prisma.user.update({
     where: { id },
-    data: { ...(firstName ? { firstName } : {}), ...(lastName ? { lastName } : {}), ...(email ? { email } : {}), ...(phone !== undefined ? { phone } : {}) },
+    data: {
+      ...(firstName ? { firstName } : {}),
+      ...(lastName ? { lastName } : {}),
+      ...(email ? { email } : {}),
+      ...(phone !== undefined ? { phone } : {}),
+    },
     select: { id: true, firstName: true, lastName: true, email: true, phone: true, isActive: true },
   });
 

@@ -12,6 +12,6 @@ export function serializeBigInt(obj: unknown): unknown {
         return (value as { toString: () => string }).toString();
       }
       return value;
-    }),
+    })
   );
 }

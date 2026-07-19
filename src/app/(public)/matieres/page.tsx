@@ -23,8 +23,12 @@ export default async function MatieresPage() {
               href={`/catalogue?subject=${encodeURIComponent(subject.name)}`}
               className="border border-outline-variant bg-surface-container-lowest p-6 hover:border-primary transition-colors duration-300"
             >
-              <span className="font-body-md text-body-md text-primary hover:text-secondary transition-colors">{subject.name}</span>
-              <p className="font-body-sm text-on-surface-variant mt-1">{subject._count.examPapers} epreuves</p>
+              <span className="font-body-md text-body-md text-primary hover:text-secondary transition-colors">
+                {subject.name}
+              </span>
+              <p className="font-body-sm text-on-surface-variant mt-1">
+                {subject._count.examPapers} epreuves
+              </p>
             </Link>
           ))}
         </div>

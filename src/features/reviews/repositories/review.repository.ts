@@ -10,7 +10,11 @@ export const reviewRepository = {
   findByExam(examPaperId: string) {
     return prisma.review.findMany({
       where: { orderItem: { examPaperId } },
-      include: { orderItem: { include: { order: { select: { user: { select: { firstName: true, lastName: true } } } } } } },
+      include: {
+        orderItem: {
+          include: { order: { select: { user: { select: { firstName: true, lastName: true } } } } },
+        },
+      },
       orderBy: { createdAt: "desc" },
     });
   },

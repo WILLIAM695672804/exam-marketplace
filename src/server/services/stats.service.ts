@@ -46,17 +46,29 @@ function formatDateLabel(date: Date, period: Period): string {
   }
 }
 
-function getDateRange(period: Period, startDate?: string, endDate?: string): { rangeStart: Date; rangeEnd: Date } {
+function getDateRange(
+  period: Period,
+  startDate?: string,
+  endDate?: string
+): { rangeStart: Date; rangeEnd: Date } {
   const now = new Date();
   const rangeStart = startDate
     ? new Date(startDate)
     : (() => {
         const d = new Date();
         switch (period) {
-          case "day":   d.setDate(d.getDate() - 7); break;
-          case "week":  d.setDate(d.getDate() - 28); break;
-          case "month": d.setMonth(d.getMonth() - 6); break;
-          case "year":  d.setFullYear(d.getFullYear() - 2); break;
+          case "day":
+            d.setDate(d.getDate() - 7);
+            break;
+          case "week":
+            d.setDate(d.getDate() - 28);
+            break;
+          case "month":
+            d.setMonth(d.getMonth() - 6);
+            break;
+          case "year":
+            d.setFullYear(d.getFullYear() - 2);
+            break;
         }
         d.setHours(0, 0, 0, 0);
         return d;
@@ -104,13 +116,16 @@ export const statsService = {
     });
 
     // Grouper par epreuve puis par periode
-    const grouped = new Map<string, {
-      examPaperId: string;
-      title: string;
-      slug: string;
-      authorName: string;
-      points: Map<string, number>;
-    }>();
+    const grouped = new Map<
+      string,
+      {
+        examPaperId: string;
+        title: string;
+        slug: string;
+        authorName: string;
+        points: Map<string, number>;
+      }
+    >();
 
     for (const dl of downloads) {
       const ep = dl.orderItem.examPaper;
@@ -151,7 +166,9 @@ export const statsService = {
   /**
    * Resume global des telechargements (total par periode)
    */
-  async getGlobalDownloadSummary(params: { period?: Period; startDate?: string; endDate?: string } = {}): Promise<DownloadPoint[]> {
+  async getGlobalDownloadSummary(
+    params: { period?: Period; startDate?: string; endDate?: string } = {}
+  ): Promise<DownloadPoint[]> {
     const { period = "day", startDate, endDate } = params;
     const { rangeStart, rangeEnd } = getDateRange(period, startDate, endDate);
 

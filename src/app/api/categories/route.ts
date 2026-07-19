@@ -11,7 +11,8 @@ export async function POST(req: Request) {
   const session = await auth();
   if (!session?.user?.id) return NextResponse.json({ error: "Non authentifie" }, { status: 401 });
   const roles = (session.user as { roles?: string[] }).roles ?? [];
-  if (!roles.includes("ADMIN")) return NextResponse.json({ error: "Non autorise" }, { status: 403 });
+  if (!roles.includes("ADMIN"))
+    return NextResponse.json({ error: "Non autorise" }, { status: 403 });
 
   const { name, slug, description } = await req.json();
   const cat = await categoryRepository.create({ name, slug, description });
@@ -22,7 +23,8 @@ export async function PUT(req: Request) {
   const session = await auth();
   if (!session?.user?.id) return NextResponse.json({ error: "Non authentifie" }, { status: 401 });
   const roles = (session.user as { roles?: string[] }).roles ?? [];
-  if (!roles.includes("ADMIN")) return NextResponse.json({ error: "Non autorise" }, { status: 403 });
+  if (!roles.includes("ADMIN"))
+    return NextResponse.json({ error: "Non autorise" }, { status: 403 });
 
   const { id, name, slug, description } = await req.json();
   const cat = await categoryRepository.update(id, { name, slug, description });
@@ -33,7 +35,8 @@ export async function DELETE(req: Request) {
   const session = await auth();
   if (!session?.user?.id) return NextResponse.json({ error: "Non authentifie" }, { status: 401 });
   const roles = (session.user as { roles?: string[] }).roles ?? [];
-  if (!roles.includes("ADMIN")) return NextResponse.json({ error: "Non autorise" }, { status: 403 });
+  if (!roles.includes("ADMIN"))
+    return NextResponse.json({ error: "Non autorise" }, { status: 403 });
 
   const { id } = await req.json();
   await categoryRepository.softDelete(id);

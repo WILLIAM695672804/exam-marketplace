@@ -64,18 +64,22 @@ export default function EpreuveDetailPage() {
     checkSession();
   }, []);
 
-  const price = selectedOption === "correction" && exam?.priceWithCorrection
-    ? `$${Number(exam.priceWithCorrection).toFixed(2)}`
-    : exam
-      ? `$${Number(exam.price).toFixed(2)}`
-      : "...";
+  const price =
+    selectedOption === "correction" && exam?.priceWithCorrection
+      ? `$${Number(exam.priceWithCorrection).toFixed(2)}`
+      : exam
+        ? `$${Number(exam.price).toFixed(2)}`
+        : "...";
 
   async function handleAddToCart() {
     if (!exam) return;
     const res = await fetch("/api/cart", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ examPaperId: exam.id, withCorrection: selectedOption === "correction" }),
+      body: JSON.stringify({
+        examPaperId: exam.id,
+        withCorrection: selectedOption === "correction",
+      }),
     });
     if (res.status === 401) {
       window.location.href = `/connexion?callbackUrl=/epreuve/${slug}`;
@@ -89,7 +93,10 @@ export default function EpreuveDetailPage() {
     const res = await fetch("/api/cart", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ examPaperId: exam.id, withCorrection: selectedOption === "correction" }),
+      body: JSON.stringify({
+        examPaperId: exam.id,
+        withCorrection: selectedOption === "correction",
+      }),
     });
     if (res.status === 401) {
       window.location.href = `/connexion?callbackUrl=/epreuve/${slug}`;
@@ -117,7 +124,12 @@ export default function EpreuveDetailPage() {
     return (
       <div className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-section-gap text-center">
         <h1 className="font-headline-lg text-primary mb-4">Epreuve introuvable</h1>
-        <Link href="/catalogue" className="font-label-caps text-label-caps text-primary hover:text-secondary underline">Retour au catalogue</Link>
+        <Link
+          href="/catalogue"
+          className="font-label-caps text-label-caps text-primary hover:text-secondary underline"
+        >
+          Retour au catalogue
+        </Link>
       </div>
     );
   }
@@ -132,29 +144,46 @@ export default function EpreuveDetailPage() {
             </span>
           </div>
           <div className="flex items-center gap-4 mt-6">
-            <span className="font-label-caps text-label-caps px-3 py-1 bg-surface-container-highest text-on-surface border border-outline-variant">{exam.year}</span>
-            <Link href={`/catalogue?category=${exam.competition.category.slug}`} className="font-label-caps text-label-caps text-secondary hover:underline">{exam.competition.category.name}</Link>
-            <span className="font-label-caps text-label-caps text-on-surface-variant">{exam.subject.name}</span>
+            <span className="font-label-caps text-label-caps px-3 py-1 bg-surface-container-highest text-on-surface border border-outline-variant">
+              {exam.year}
+            </span>
+            <Link
+              href={`/catalogue?category=${exam.competition.category.slug}`}
+              className="font-label-caps text-label-caps text-secondary hover:underline"
+            >
+              {exam.competition.category.name}
+            </Link>
+            <span className="font-label-caps text-label-caps text-on-surface-variant">
+              {exam.subject.name}
+            </span>
           </div>
         </div>
 
         <div className="lg:col-span-5">
           <h1 className="font-headline-lg text-primary mb-4">{exam.title}</h1>
-          <p className="font-body-md text-on-surface-variant mb-4">Par {exam.author.firstName} {exam.author.lastName}</p>
+          <p className="font-body-md text-on-surface-variant mb-4">
+            Par {exam.author.firstName} {exam.author.lastName}
+          </p>
 
           {/* Infos professeur (admin uniquement) */}
           {isAdmin && (exam.professorName || exam.professorPhone) && (
             <div className="border border-secondary-fixed-dim/50 bg-secondary-fixed/10 p-4 mb-6 space-y-1">
-              <p className="font-label-caps text-label-caps text-on-surface-variant uppercase mb-2">Professeur remettant</p>
+              <p className="font-label-caps text-label-caps text-on-surface-variant uppercase mb-2">
+                Professeur remettant
+              </p>
               {exam.professorName && (
                 <p className="font-body-sm text-primary">
-                  <span className="font-label-caps text-[10px] text-on-surface-variant uppercase">Nom :</span>{" "}
+                  <span className="font-label-caps text-[10px] text-on-surface-variant uppercase">
+                    Nom :
+                  </span>{" "}
                   {exam.professorName}
                 </p>
               )}
               {exam.professorPhone && (
                 <p className="font-body-sm text-primary">
-                  <span className="font-label-caps text-[10px] text-on-surface-variant uppercase">Tel :</span>{" "}
+                  <span className="font-label-caps text-[10px] text-on-surface-variant uppercase">
+                    Tel :
+                  </span>{" "}
                   {exam.professorPhone}
                 </p>
               )}
@@ -164,25 +193,45 @@ export default function EpreuveDetailPage() {
           <div className="border border-outline-variant bg-surface-container-lowest p-8 space-y-6">
             <label className="flex items-center justify-between cursor-pointer border-b border-outline-variant pb-4">
               <div className="flex items-center gap-3">
-                <input type="radio" name="pricing" checked={selectedOption === "exam"} onChange={() => setSelectedOption("exam")} className="border-outline-variant text-primary focus:ring-primary w-4 h-4" />
+                <input
+                  type="radio"
+                  name="pricing"
+                  checked={selectedOption === "exam"}
+                  onChange={() => setSelectedOption("exam")}
+                  className="border-outline-variant text-primary focus:ring-primary w-4 h-4"
+                />
                 <div>
                   <span className="font-body-lg text-primary font-medium">Epreuve seule</span>
-                  <p className="font-body-sm text-on-surface-variant">Acces au fichier de l&apos;epreuve</p>
+                  <p className="font-body-sm text-on-surface-variant">
+                    Acces au fichier de l&apos;epreuve
+                  </p>
                 </div>
               </div>
-              <span className="font-body-lg text-primary font-bold">${Number(exam.price).toFixed(2)}</span>
+              <span className="font-body-lg text-primary font-bold">
+                ${Number(exam.price).toFixed(2)}
+              </span>
             </label>
 
             {exam.priceWithCorrection && (
               <label className="flex items-center justify-between cursor-pointer">
                 <div className="flex items-center gap-3">
-                  <input type="radio" name="pricing" checked={selectedOption === "correction"} onChange={() => setSelectedOption("correction")} className="border-outline-variant text-primary focus:ring-primary w-4 h-4" />
+                  <input
+                    type="radio"
+                    name="pricing"
+                    checked={selectedOption === "correction"}
+                    onChange={() => setSelectedOption("correction")}
+                    className="border-outline-variant text-primary focus:ring-primary w-4 h-4"
+                  />
                   <div>
                     <span className="font-body-lg text-primary font-medium">Avec corrige</span>
-                    <p className="font-body-sm text-on-surface-variant">Epreuve + guide de correction officiel</p>
+                    <p className="font-body-sm text-on-surface-variant">
+                      Epreuve + guide de correction officiel
+                    </p>
                   </div>
                 </div>
-                <span className="font-body-lg text-primary font-bold">${Number(exam.priceWithCorrection).toFixed(2)}</span>
+                <span className="font-body-lg text-primary font-bold">
+                  ${Number(exam.priceWithCorrection).toFixed(2)}
+                </span>
               </label>
             )}
 
@@ -192,12 +241,20 @@ export default function EpreuveDetailPage() {
                 <span className="font-headline-sm text-primary">{price}</span>
               </div>
 
-              <button onClick={handleBuyNow} className="w-full bg-primary text-on-primary font-label-caps text-label-caps py-4 hover:bg-inverse-surface transition-colors flex items-center justify-center gap-2 group">
+              <button
+                onClick={handleBuyNow}
+                className="w-full bg-primary text-on-primary font-label-caps text-label-caps py-4 hover:bg-inverse-surface transition-colors flex items-center justify-center gap-2 group"
+              >
                 Acheter maintenant
-                <span className="material-symbols-outlined text-[18px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                <span className="material-symbols-outlined text-[18px] group-hover:translate-x-1 transition-transform">
+                  arrow_forward
+                </span>
               </button>
 
-              <button onClick={handleAddToCart} className="w-full border border-primary text-primary font-label-caps text-label-caps py-4 hover:bg-surface-container transition-colors flex items-center justify-center gap-2">
+              <button
+                onClick={handleAddToCart}
+                className="w-full border border-primary text-primary font-label-caps text-label-caps py-4 hover:bg-surface-container transition-colors flex items-center justify-center gap-2"
+              >
                 <span className="material-symbols-outlined text-[18px]">shopping_cart</span>
                 Ajouter au panier
               </button>
@@ -212,8 +269,12 @@ export default function EpreuveDetailPage() {
       </div>
 
       <div className="mt-section-gap pt-8 border-t border-outline-variant">
-        <Link href="/catalogue" className="font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-colors inline-flex items-center gap-2">
-          <span className="material-symbols-outlined text-[16px]">arrow_back</span>Retour au catalogue
+        <Link
+          href="/catalogue"
+          className="font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-colors inline-flex items-center gap-2"
+        >
+          <span className="material-symbols-outlined text-[16px]">arrow_back</span>Retour au
+          catalogue
         </Link>
       </div>
     </div>

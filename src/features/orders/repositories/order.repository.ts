@@ -28,7 +28,9 @@ export const orderRepository = {
       include: {
         items: {
           include: {
-            examPaper: { select: { title: true, slug: true, paperFileId: true, correctionFileId: true } },
+            examPaper: {
+              select: { title: true, slug: true, paperFileId: true, correctionFileId: true },
+            },
             downloads: true,
           },
         },
@@ -56,9 +58,10 @@ export const orderRepository = {
     }
 
     const totalAmount = cartItems.reduce((sum, item) => {
-      const price = item.withCorrection && item.examPaper.priceWithCorrection
-        ? Number(item.examPaper.priceWithCorrection)
-        : Number(item.examPaper.price);
+      const price =
+        item.withCorrection && item.examPaper.priceWithCorrection
+          ? Number(item.examPaper.priceWithCorrection)
+          : Number(item.examPaper.price);
       return sum + price;
     }, 0);
 
@@ -70,9 +73,10 @@ export const orderRepository = {
         items: {
           create: cartItems.map((item) => ({
             examPaperId: item.examPaperId,
-            price: item.withCorrection && item.examPaper.priceWithCorrection
-              ? item.examPaper.priceWithCorrection
-              : item.examPaper.price,
+            price:
+              item.withCorrection && item.examPaper.priceWithCorrection
+                ? item.examPaper.priceWithCorrection
+                : item.examPaper.price,
             withCorrection: item.withCorrection,
             titleSnapshot: item.examPaper.title,
             yearSnapshot: item.examPaper.year,

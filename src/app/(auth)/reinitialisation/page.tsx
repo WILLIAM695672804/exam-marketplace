@@ -8,7 +8,7 @@ import type { AuthResult } from "@/features/auth/actions/auth.actions";
 export default function ReinitialisationPage() {
   const [state, formAction, isPending] = useActionState<AuthResult | null, FormData>(
     resetPasswordAction,
-    null,
+    null
   );
 
   if (state?.success) {

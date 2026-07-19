@@ -21,12 +21,7 @@ export const userRepository = {
     });
   },
 
-  create(data: {
-    firstName: string;
-    lastName: string;
-    email: string;
-    passwordHash: string;
-  }) {
+  create(data: { firstName: string; lastName: string; email: string; passwordHash: string }) {
     return prisma.user.create({
       data: {
         firstName: data.firstName,

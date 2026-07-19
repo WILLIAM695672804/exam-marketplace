@@ -47,7 +47,7 @@ export async function POST(req: Request) {
     logger.error({ error }, "Erreur upload fichier");
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Erreur upload" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

@@ -28,7 +28,10 @@ function formatDateLabel(date: string, period: Period): string {
   if (period === "year") return date;
   if (period === "month") {
     const [y, m] = date.split("-");
-    return new Date(Number(y), Number(m) - 1).toLocaleDateString("fr", { year: "numeric", month: "long" });
+    return new Date(Number(y), Number(m) - 1).toLocaleDateString("fr", {
+      year: "numeric",
+      month: "long",
+    });
   }
   if (period === "week") {
     const [y, w] = date.split("-");
@@ -64,6 +67,7 @@ export function StatsDownloads() {
   }, [period]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- fetchStats est un data fetcher asynchrone, pas un setState direct
     void fetchStats();
   }, [fetchStats]);
 
@@ -78,7 +82,10 @@ export function StatsDownloads() {
           {PERIODS.map((p) => (
             <button
               key={p.value}
-              onClick={() => { setPeriod(p.value); setExpanded(null); }}
+              onClick={() => {
+                setPeriod(p.value);
+                setExpanded(null);
+              }}
               className={`font-label-caps text-label-caps uppercase px-4 py-2 transition-colors border ${
                 period === p.value
                   ? "bg-primary text-on-primary border-primary"
@@ -95,7 +102,9 @@ export function StatsDownloads() {
       <div className="bg-surface-container-lowest border border-outline-variant p-6 flex items-center gap-4">
         <span className="material-symbols-outlined text-[32px] text-secondary">download</span>
         <div>
-          <p className="font-label-caps text-label-caps text-on-surface-variant uppercase">Total telechargements</p>
+          <p className="font-label-caps text-label-caps text-on-surface-variant uppercase">
+            Total telechargements
+          </p>
           <p className="font-headline-md text-primary">{loading ? "..." : totalDownloads}</p>
         </div>
       </div>
@@ -103,16 +112,23 @@ export function StatsDownloads() {
       {/* Liste des epreuves */}
       {error ? (
         <div className="border border-error bg-error-container/20 p-8 text-center">
-          <span className="material-symbols-outlined text-[32px] text-error mb-3 block">error_outline</span>
+          <span className="material-symbols-outlined text-[32px] text-error mb-3 block">
+            error_outline
+          </span>
           <p className="font-body-md text-on-error-container mb-2">Erreur de chargement</p>
           <p className="font-body-sm text-on-surface-variant mb-4">{error}</p>
-          <button onClick={fetchStats} className="font-label-caps text-label-caps text-primary border border-primary px-4 py-2 hover:bg-surface-container-low transition-colors">
+          <button
+            onClick={fetchStats}
+            className="font-label-caps text-label-caps text-primary border border-primary px-4 py-2 hover:bg-surface-container-low transition-colors"
+          >
             Reessayer
           </button>
         </div>
       ) : loading ? (
         <div className="animate-pulse space-y-4">
-          {[1, 2, 3].map((i) => <div key={i} className="h-20 bg-surface-variant" />)}
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="h-20 bg-surface-variant" />
+          ))}
         </div>
       ) : stats.length === 0 ? (
         <p className="text-center text-on-surface-variant py-20 border border-outline-variant">
@@ -121,7 +137,10 @@ export function StatsDownloads() {
       ) : (
         <div className="space-y-4">
           {stats.map((exam) => (
-            <div key={exam.examPaperId} className="border border-outline-variant bg-surface-container-lowest">
+            <div
+              key={exam.examPaperId}
+              className="border border-outline-variant bg-surface-container-lowest"
+            >
               {/* En-tete de l'epreuve */}
               <button
                 onClick={() => setExpanded(expanded === exam.examPaperId ? null : exam.examPaperId)}
@@ -130,10 +149,13 @@ export function StatsDownloads() {
                 <div className="flex-1 min-w-0">
                   <p className="font-body-md text-primary truncate">{exam.title}</p>
                   <p className="font-body-sm text-on-surface-variant">
-                    {exam.authorName} — {exam.totalDownloads} telechargement{exam.totalDownloads > 1 ? "s" : ""}
+                    {exam.authorName} — {exam.totalDownloads} telechargement
+                    {exam.totalDownloads > 1 ? "s" : ""}
                   </p>
                 </div>
-                <span className={`material-symbols-outlined text-[20px] text-on-surface-variant transition-transform shrink-0 ml-4 ${expanded === exam.examPaperId ? "rotate-180" : ""}`}>
+                <span
+                  className={`material-symbols-outlined text-[20px] text-on-surface-variant transition-transform shrink-0 ml-4 ${expanded === exam.examPaperId ? "rotate-180" : ""}`}
+                >
                   expand_more
                 </span>
               </button>
@@ -144,8 +166,12 @@ export function StatsDownloads() {
                   <table className="w-full">
                     <thead>
                       <tr className="border-b border-outline-variant/20">
-                        <th className="text-left font-label-caps text-[10px] text-on-surface-variant uppercase py-2">Periode</th>
-                        <th className="text-right font-label-caps text-[10px] text-on-surface-variant uppercase py-2">Telechargements</th>
+                        <th className="text-left font-label-caps text-[10px] text-on-surface-variant uppercase py-2">
+                          Periode
+                        </th>
+                        <th className="text-right font-label-caps text-[10px] text-on-surface-variant uppercase py-2">
+                          Telechargements
+                        </th>
                       </tr>
                     </thead>
                     <tbody>

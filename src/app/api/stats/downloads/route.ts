@@ -31,7 +31,7 @@ export async function GET(req: Request) {
     logger.error({ error }, "Erreur API stats/downloads");
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Erreur interne" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

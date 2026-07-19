@@ -36,7 +36,10 @@ export const authService = {
     }
 
     if (!user.isActive) {
-      return { success: false as const, error: "Votre compte a ete desactive. Contactez le support." };
+      return {
+        success: false as const,
+        error: "Votre compte a ete desactive. Contactez le support.",
+      };
     }
 
     const roles = user.userRoles.map((ur) => ur.role.name);

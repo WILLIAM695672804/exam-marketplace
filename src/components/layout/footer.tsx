@@ -32,8 +32,7 @@ export function Footer() {
             ExamMarket
           </Link>
           <p className="font-body-sm text-body-sm text-on-surface-variant mt-auto">
-            &copy; {new Date().getFullYear()} ExamMarket. Excellence in
-            Professional Certification.
+            &copy; {new Date().getFullYear()} ExamMarket. Excellence in Professional Certification.
           </p>
         </div>
 

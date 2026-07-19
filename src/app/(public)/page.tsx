@@ -102,7 +102,9 @@ export default async function HomePage() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-gutter">
             {categories.length === 0 ? (
-              <p className="text-center text-on-surface-variant py-20 sm:col-span-2 lg:col-span-4">Aucune categorie disponible pour le moment.</p>
+              <p className="text-center text-on-surface-variant py-20 sm:col-span-2 lg:col-span-4">
+                Aucune categorie disponible pour le moment.
+              </p>
             ) : (
               categories.slice(0, 4).map((cat) => (
                 <Link
@@ -182,10 +184,16 @@ export default async function HomePage() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-gutter">
             {recentExams.length === 0 ? (
-              <p className="text-center text-on-surface-variant py-20 md:col-span-3">Aucune epreuve publiee pour le moment.</p>
+              <p className="text-center text-on-surface-variant py-20 md:col-span-3">
+                Aucune epreuve publiee pour le moment.
+              </p>
             ) : (
               recentExams.map((exam) => (
-                <Link key={exam.id} href={`/epreuve/${exam.slug}`} className="flex flex-col group cursor-pointer">
+                <Link
+                  key={exam.id}
+                  href={`/epreuve/${exam.slug}`}
+                  className="flex flex-col group cursor-pointer"
+                >
                   <div className="mb-4">
                     <div className="w-full aspect-[4/3] bg-surface-variant flex items-center justify-center group-hover:bg-surface-container-high transition-colors duration-500">
                       <span className="font-headline-lg text-[64px] text-on-surface-variant/20 select-none">

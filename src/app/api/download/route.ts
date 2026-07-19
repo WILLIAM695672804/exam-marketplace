@@ -38,9 +38,7 @@ export async function GET(req: Request) {
   }
 
   const file =
-    type === "correction"
-      ? orderItem.examPaper.correctionFile
-      : orderItem.examPaper.paperFile;
+    type === "correction" ? orderItem.examPaper.correctionFile : orderItem.examPaper.paperFile;
 
   if (!file) {
     return NextResponse.json({ error: "Fichier introuvable" }, { status: 404 });
@@ -49,10 +47,7 @@ export async function GET(req: Request) {
   // Verifier la limite de telechargements
   const maxDownloads = 5;
   if (orderItem.downloads.length >= maxDownloads) {
-    return NextResponse.json(
-      { error: "Limite de telechargements atteinte" },
-      { status: 429 },
-    );
+    return NextResponse.json({ error: "Limite de telechargements atteinte" }, { status: 429 });
   }
 
   const buffer = await getFile(file.path);
@@ -65,7 +60,7 @@ export async function GET(req: Request) {
     session.user.id,
     orderItemId,
     req.headers.get("x-forwarded-for") || undefined,
-    req.headers.get("user-agent") || undefined,
+    req.headers.get("user-agent") || undefined
   );
 
   await auditService.logDownload(session.user.id, orderItem.examPaper.id);

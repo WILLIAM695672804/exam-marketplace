@@ -18,7 +18,7 @@ async function ensureUploadDir(): Promise<void> {
 export async function uploadFile(
   buffer: Buffer,
   filename: string,
-  _mimeType: string,
+  _mimeType: string
 ): Promise<{ url: string; path: string; checksum: string }> {
   await ensureUploadDir();
 

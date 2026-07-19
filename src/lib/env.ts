@@ -8,9 +8,7 @@ const envSchema = z.object({
   NOTCHPAY_API_SECRET: z.string().optional(),
   NEXT_PUBLIC_APP_URL: z.string().url().default("http://localhost:3000"),
   UPLOAD_DIR: z.string().default("uploads"),
-  NODE_ENV: z
-    .enum(["development", "production", "test"])
-    .default("development"),
+  NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
 });
 
 export const env = envSchema.parse(process.env);

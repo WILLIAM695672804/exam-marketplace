@@ -26,7 +26,12 @@ export const mailService = {
         text: `Bonjour ${user.firstName},\n\nVotre commande ${order.number} a ete confirmee.\n\nRecapitulatif :\n${itemsList}\n\nTotal : ${order.totalAmount} FCFA\n\nMerci de votre confiance !`,
       });
 
-      await this.createNotification(userId, "PAYMENT", "Commande confirmee", `Votre commande ${order.number} a ete payee avec succes.`);
+      await this.createNotification(
+        userId,
+        "PAYMENT",
+        "Commande confirmee",
+        `Votre commande ${order.number} a ete payee avec succes.`
+      );
     } catch (error) {
       logger.error({ error, userId, orderId }, "Erreur envoi email confirmation");
     }
@@ -40,7 +45,9 @@ export const mailService = {
       await resend.emails.send({
         from: FROM_EMAIL,
         to: user.email,
-        subject: approved ? "Accreditation enseignant approuvee" : "Accreditation enseignant refusee",
+        subject: approved
+          ? "Accreditation enseignant approuvee"
+          : "Accreditation enseignant refusee",
         text: approved
           ? `Bonjour ${user.firstName},\n\nVotre demande d'accreditation enseignant a ete approuvee. Vous pouvez maintenant publier vos epreuves sur la plateforme.`
           : `Bonjour ${user.firstName},\n\nVotre demande d'accreditation enseignant a ete refusee.\nRaison : ${reason || "Non specifiee"}`,
@@ -52,7 +59,7 @@ export const mailService = {
         approved ? "Accreditation approuvee" : "Accreditation refusee",
         approved
           ? "Vous pouvez maintenant publier des epreuves."
-          : `Raison : ${reason || "Non specifiee"}`,
+          : `Raison : ${reason || "Non specifiee"}`
       );
     } catch (error) {
       logger.error({ error, userId }, "Erreur envoi email validation enseignant");
@@ -74,7 +81,12 @@ export const mailService = {
     }
   },
 
-  async createNotification(userId: string, type: "PAYMENT" | "VALIDATION" | "REJECTION" | "SYSTEM", subject: string, content: string) {
+  async createNotification(
+    userId: string,
+    type: "PAYMENT" | "VALIDATION" | "REJECTION" | "SYSTEM",
+    subject: string,
+    content: string
+  ) {
     return prisma.notification.create({
       data: { userId, type, channel: "IN_APP", subject, content },
     });
