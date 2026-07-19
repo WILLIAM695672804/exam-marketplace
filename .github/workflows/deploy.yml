@@ -106,8 +106,11 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SSH_PORT }}
-          envs: APP_DIR,BACKUP_DIR,TMP_DIR
+          envs: APP_DIR,BACKUP_DIR,TMP_DIR,DATABASE_URL,AUTH_SECRET
           script: |
             cd "$APP_DIR"
             chmod +x scripts/deploy.sh
             ./scripts/deploy.sh
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          AUTH_SECRET: ${{ secrets.AUTH_SECRET }}

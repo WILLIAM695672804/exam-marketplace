@@ -167,6 +167,11 @@ run_prisma() {
         exit 1
     fi
 
+    # Charger les variables d'environnement depuis le .env de production
+    if [ -f "$APP_DIR/.env" ]; then
+        export $(grep -v '^\s*#' "$APP_DIR/.env" | xargs)
+    fi
+
     npx prisma generate
 
     if [ ! -d node_modules/.prisma ]; then
