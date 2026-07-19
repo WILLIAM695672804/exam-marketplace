@@ -6,6 +6,8 @@ const FROM_EMAIL = "ExamMarket <noreply@exammarketplace.com>";
 
 export const mailService = {
   async sendOrderConfirmation(userId: string, orderId: string) {
+    if (!resend) return;
+
     const user = await prisma.user.findUnique({ where: { id: userId } });
     const order = await prisma.order.findUnique({
       where: { id: orderId },
@@ -38,6 +40,8 @@ export const mailService = {
   },
 
   async sendTeacherValidation(userId: string, approved: boolean, reason?: string) {
+    if (!resend) return;
+
     const user = await prisma.user.findUnique({ where: { id: userId } });
     if (!user) return;
 
@@ -67,6 +71,8 @@ export const mailService = {
   },
 
   async sendPasswordReset(email: string, token: string) {
+    if (!resend) return;
+
     try {
       const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL}/reinitialisation?token=${token}`;
 
