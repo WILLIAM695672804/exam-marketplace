@@ -1,4 +1,23 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
+
+vi.mock("@/lib/prisma", () => ({
+  prisma: {
+    verificationToken: {
+      create: vi.fn(),
+      findUnique: vi.fn(),
+      delete: vi.fn(),
+    },
+  },
+}));
+
+vi.mock("@/features/auth/repositories/user.repository", () => ({
+  userRepository: {
+    findByEmail: vi.fn(),
+    create: vi.fn(),
+    updatePassword: vi.fn(),
+  },
+}));
+
 import { authService } from "@/features/auth/services/auth.service";
 
 describe("authService", () => {

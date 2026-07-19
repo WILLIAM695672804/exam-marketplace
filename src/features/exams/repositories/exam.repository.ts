@@ -31,7 +31,11 @@ export const examRepository = {
 
     const where: Prisma.ExamPaperWhereInput = {
       deletedAt: null,
-      ...(status && status !== "ALL" ? { status: status as "DRAFT" | "PUBLISHED" | "MASKED" } : {}),
+      ...(status
+        ? status !== "ALL"
+          ? { status: status as "DRAFT" | "PUBLISHED" | "MASKED" }
+          : {}
+        : { status: "PUBLISHED" as const }),
       ...(authorId ? { authorId } : {}),
       ...(competitionId ? { competitionId } : {}),
       ...(subjectId ? { subjectId } : {}),
