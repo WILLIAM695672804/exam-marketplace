@@ -63,10 +63,11 @@ jobs:
 
       - name: Create deployment archive
         run: |
-          # Utilisation du fichier d'exclusions centralisé
+          ARCHIVE="/tmp/deploy.tar.gz"
           tar \
             --exclude-from=scripts/archive-excludes.txt \
-            -czf deploy.tar.gz .
+            -czf "$ARCHIVE" .
+          mv "$ARCHIVE" deploy.tar.gz
           echo "Archive créée :"
           ls -lh deploy.tar.gz
 
