@@ -7,7 +7,7 @@ export default function AProposPage() {
 
           <div className="space-y-8">
             <div>
-              <h2 className="font-headline-sm text-primary mb-4">Notre mission</h2>
+              <h2 className="font-headline-sm text-primary mb-4">Notre</h2>
               <p className="font-body-md text-body-md text-on-surface-variant leading-relaxed">
                 Exam Marketplace democratise l&apos;acces aux epreuves de concours en Afrique. Nous
                 permettons aux candidats de se preparer efficacement en accedant a une vaste
