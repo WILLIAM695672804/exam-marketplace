@@ -47,6 +47,13 @@ jobs:
 
       - name: Build Next.js
         run: npm run build
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          NOTCHPAY_API_KEY: ${{ secrets.NOTCHPAY_API_KEY }}
+          NOTCHPAY_API_SECRET: ${{ secrets.NOTCHPAY_API_SECRET }}
+          NEXT_PUBLIC_APP_URL: ${{ vars.NEXT_PUBLIC_APP_URL || 'http://localhost:3000' }}
 
       - name: Verify Next.js build
         run: test -f .next/BUILD_ID
