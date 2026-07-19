@@ -195,6 +195,21 @@ run_prisma() {
 }
 
 # -------------------------------------------------------------------
+# CONSTRUCTION DE NEXT.JS
+# -------------------------------------------------------------------
+build_next() {
+    log "Construction de Next.js"
+    cd "$TMP_DIR"
+
+    npm run build
+
+    if [ ! -d ".next" ]; then
+        error "Le build Next.js a echoue : dossier .next absent"
+        exit 1
+    fi
+}
+
+# -------------------------------------------------------------------
 # DÉPLOIEMENT DES FICHIERS VERS LE RÉPERTOIRE DE PRODUCTION
 # -------------------------------------------------------------------
 deploy_files() {
@@ -255,6 +270,7 @@ main() {
     extract_archive
     install_dependencies
     run_prisma
+    build_next
     deploy_files
     restart_passenger
     post_cleanup
