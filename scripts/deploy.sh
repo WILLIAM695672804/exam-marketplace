@@ -167,18 +167,13 @@ run_prisma() {
         exit 1
     fi
 
-    # Charger les variables d'environnement depuis le .env de production
-    if [ -f "$APP_DIR/.env" ]; then
-        set -a
-        source "$APP_DIR/.env"
-        set +a
-    else
-        error "Fichier .env introuvable : $APP_DIR/.env"
+    if [ -z "${DATABASE_URL:-}" ]; then
+        error "DATABASE_URL n'est pas definie"
         exit 1
     fi
 
-    if [ -z "${DATABASE_URL:-}" ]; then
-        error "DATABASE_URL n'est pas definie"
+    if [ -z "${AUTH_SECRET:-}" ]; then
+        error "AUTH_SECRET n'est pas definie"
         exit 1
     fi
 
