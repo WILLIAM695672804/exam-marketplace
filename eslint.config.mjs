@@ -20,6 +20,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Fichier Passenger O2Switch (CommonJS requis par l'hebergeur)
+    "app.js",
   ]),
 ]);
 
