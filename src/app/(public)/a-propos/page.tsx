@@ -17,7 +17,7 @@ export default function AProposPage() {
             </div>
 
             <div>
-              <h2 className="font-headline-sm text-primary mb-4">Pourquoi nous choisir</h2>
+              <h2 className="font-headline-sm text-primary mb-4">Pourquoi nous</h2>
               <ul className="space-y-4">
                 {[
                   {
