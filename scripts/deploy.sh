@@ -141,7 +141,7 @@ install_dependencies() {
         exit 1
     fi
 
-    npm ci --omit=dev --prefer-offline --no-audit --no-fund
+    HUSKY=0 npm ci --omit=dev --prefer-offline --no-audit --no-fund
 
     if [ ! -d node_modules ]; then
         error "Échec de l'installation des dépendances (node_modules absent)"
