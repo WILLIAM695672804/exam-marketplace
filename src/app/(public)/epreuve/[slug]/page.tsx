@@ -260,7 +260,7 @@ export default function EpreuveDetailPage() {
 
               <p className="text-center font-body-sm text-on-surface-variant flex items-center justify-center gap-1">
                 <span className="material-symbols-outlined text-[14px]">lock</span>
-                Paiement securise via NotchPay
+                Paiement securise via Fapshi
               </p>
             </div>
           </div>

@@ -32,6 +32,7 @@ model User {
   teacherRequest   TeacherRequest?
   userRoles        UserRoleOnRole[]
   avatarFile       File?            @relation("UserAvatar", fields: [avatarFileId], references: [id])
+  commissions      Commission[]
 
   @@index([email])
   @@index([isActive])
@@ -217,6 +218,7 @@ model ExamPaper {
   paperFile           File            @relation("PaperFile", fields: [paperFileId], references: [id])
   subject             Subject         @relation(fields: [subjectId], references: [id])
   orderItems          OrderItem[]
+  commissions         Commission[]
 
   @@index([authorId])
   @@index([competitionId])
@@ -297,34 +299,55 @@ model OrderItem {
 }
 
 model Transaction {
-  id           String            @id @default(uuid())
-  orderId      String
-  provider     PaymentProvider   @default(NOTCHPAY)
-  reference    String?
-  amount       Decimal           @db.Decimal(10, 2)
-  status       TransactionStatus @default(INITIATED)
-  callbackData Json?
-  createdAt    DateTime          @default(now())
-  updatedAt    DateTime          @updatedAt
-  commission   Commission?
-  order        Order             @relation(fields: [orderId], references: [id])
+  id                String            @id @default(uuid())
+  orderId           String
+  provider          PaymentProvider   @default(FAPSHI)
+  merchantReference String?
+  providerTxId      String?           @unique
+  providerRef       String?
+  amount            Decimal           @db.Decimal(10, 2)
+  currency          String            @default("XAF")
+  status            TransactionStatus @default(INITIATED)
+  statusReason      String?
+  paidAt            DateTime?
+  idempotencyKey    String?           @unique
+  attempts          Int               @default(1)
+  lastAttemptAt     DateTime          @default(now())
+  lastErrorCode     String?
+  lastErrorBody     Json?
+  ipAddress         String?
+  userAgent         String?
+  callbackData      Json?
+  initiatedAt       DateTime          @default(now())
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  commissions       Commission[]
+  order             Order             @relation(fields: [orderId], references: [id])
 
   @@index([orderId])
   @@index([status])
   @@index([provider])
+  @@index([idempotencyKey])
+  @@index([providerTxId])
+  @@index([status, initiatedAt])
   @@map("transactions")
 }
 
 model Commission {
   id             String      @id @default(uuid())
-  transactionId  String      @unique
+  transactionId  String
   rate           Decimal     @db.Decimal(5, 2)
   platformAmount Decimal     @db.Decimal(10, 2)
   teacherAmount  Decimal     @db.Decimal(10, 2)
+  examPaperId    String?
+  teacherId      String?
   createdAt      DateTime    @default(now())
   transaction    Transaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+  examPaper      ExamPaper?  @relation(fields: [examPaperId], references: [id])
+  teacher        User?       @relation(fields: [teacherId], references: [id])
 
   @@index([transactionId])
+  @@index([teacherId])
   @@map("commissions")
 }
 
@@ -422,6 +445,7 @@ enum OrderStatus {
 
 enum TransactionStatus {
   INITIATED
+  PENDING
   SUCCESS
   FAILED
   EXPIRED
@@ -446,10 +470,23 @@ enum AuditAction {
   UPDATE
   DELETE
   DOWNLOAD
-  PAYMENT
   ROLE_CHANGE
   MASK
   UNMASK
+  // Module paiement
+  PAYMENT_INITIATED
+  PAYMENT_SUCCEEDED
+  PAYMENT_FAILED
+  PAYMENT_EXPIRED
+  WEBHOOK_RECEIVED
+  WEBHOOK_DUPLICATE
+  WEBHOOK_VERIFIED
+  WEBHOOK_SIGNATURE_INVALID
+  WEBHOOK_AMOUNT_MISMATCH
+  DOUBLE_CLICK_BLOCKED
+  DOUBLE_PAYMENT_BLOCKED
+  ORDER_OWNERSHIP_VIOLATION
+  COMMISSION_CALCULATED
 }
 
 enum StorageProvider {
@@ -459,8 +496,8 @@ enum StorageProvider {
 }
 
 enum PaymentProvider {
+  FAPSHI
   NOTCHPAY
   CAMPAY
   STRIPE
-  PAYPAL
 }

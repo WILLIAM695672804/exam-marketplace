@@ -49,7 +49,7 @@ export const auditService = {
   },
 
   logPayment(userId: string, resourceId: string) {
-    return this.log({ userId, action: "PAYMENT", resource: "payment", resourceId });
+    return this.log({ userId, action: "PAYMENT_SUCCEEDED", resource: "payment", resourceId });
   },
 
   logRoleChange(userId: string, resourceId: string, details: Record<string, unknown>) {

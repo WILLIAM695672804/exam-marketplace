@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { formatPrice } from "@/lib/utils";
+import { PaymentModal } from "@/components/ui/payment-modal";
 
 interface CartItem {
   id: string;
@@ -20,6 +21,11 @@ interface CartItem {
 export function PanierContent() {
   const [items, setItems] = useState<CartItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isPaying, setIsPaying] = useState(false);
+  const [paymentModal, setPaymentModal] = useState<{
+    paymentUrl: string;
+    orderId: string;
+  } | null>(null);
 
   useEffect(() => {
     async function load() {
@@ -163,23 +169,67 @@ export function PanierContent() {
             </div>
             <button
               onClick={async () => {
-                const res = await fetch("/api/orders/create", { method: "POST" });
-                if (res.ok) {
-                  const order = await res.json();
-                  await fetch("/api/payments/simulate", {
+                if (isPaying) return;
+                setIsPaying(true);
+                try {
+                  // 1. Créer la commande depuis le panier
+                  const orderRes = await fetch("/api/orders/create", { method: "POST" });
+                  if (!orderRes.ok) {
+                    setIsPaying(false);
+                    return;
+                  }
+                  const order = await orderRes.json();
+
+                  // 2. Initier le paiement
+                  const payRes = await fetch("/api/payments/initiate", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ orderId: order.id }),
+                    body: JSON.stringify({
+                      orderId: order.id,
+                      idempotencyKey: crypto.randomUUID(),
+                    }),
                   });
-                  window.location.href = "/dashboard/commandes";
+
+                  if (!payRes.ok) {
+                    setIsPaying(false);
+                    return;
+                  }
+
+                  const { data } = await payRes.json();
+
+                  // 3. Modal de paiement ou redirection
+                  if (data?.paymentUrl) {
+                    setPaymentModal({ paymentUrl: data.paymentUrl, orderId: order.id });
+                  } else {
+                    window.location.href = "/dashboard/commandes";
+                  }
+                } catch {
+                  setIsPaying(false);
                 }
               }}
-              className="w-full bg-primary text-on-primary font-label-caps text-label-caps uppercase py-4 hover:bg-inverse-surface transition-colors"
+              disabled={isPaying}
+              className="w-full bg-primary text-on-primary font-label-caps text-label-caps uppercase py-4 hover:bg-inverse-surface transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Proceder au paiement
+              {isPaying ? "Redirection..." : "Proceder au paiement"}
             </button>
           </div>
         </div>
+      )}
+
+      {/* Modal de paiement Fapshi */}
+      {paymentModal && (
+        <PaymentModal
+          paymentUrl={paymentModal.paymentUrl}
+          orderId={paymentModal.orderId}
+          onClose={() => {
+            setPaymentModal(null);
+            setIsPaying(false);
+          }}
+          onSuccess={() => {
+            setPaymentModal(null);
+            window.location.href = "/dashboard/commandes";
+          }}
+        />
       )}
     </div>
   );

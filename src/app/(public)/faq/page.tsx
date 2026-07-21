@@ -13,7 +13,7 @@ const FAQS = [
   },
   {
     q: "Quels moyens de paiement sont acceptes ?",
-    a: "Nous acceptons Mobile Money (MTN, Orange), Orange Money, et les cartes bancaires via notre partenaire NotchPay.",
+    a: "Nous acceptons Mobile Money (MTN, Orange), Orange Money, et les cartes bancaires via notre partenaire Fapshi (Mobile Money, Orange Money, Carte Bancaire).",
   },
   {
     q: "Puis-je obtenir un remboursement ?",

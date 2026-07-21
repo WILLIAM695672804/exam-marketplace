@@ -1,6 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Désactiver l'avertissement de workspace racine (lockfile dans le dossier projet)
+  turbopack: { root: "." },
   // Empecher les packages Node.js d'etre bundles cote client
   serverExternalPackages: ["@prisma/adapter-pg", "pg", "pino", "bcryptjs"],
   images: {
