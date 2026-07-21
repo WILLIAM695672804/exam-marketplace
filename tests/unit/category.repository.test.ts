@@ -51,6 +51,7 @@ describe("categoryRepository", () => {
 
     expect(prisma.category.create).toHaveBeenCalledWith({
       data: { name: "Nouvelle", slug: "nouvelle" },
+      include: { _count: { select: { competitions: true } } },
     });
   });
 
