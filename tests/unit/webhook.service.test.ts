@@ -78,18 +78,14 @@ describe("WebhookService", () => {
       const svc = createService();
       mockProvider.verifyWebhookSignature.mockReturnValue(false);
 
-      await expect(
-        svc.process("raw-body", "bad-sig", "1.2.3.4")
-      ).rejects.toThrow(PaymentError);
+      await expect(svc.process("raw-body", "bad-sig", "1.2.3.4")).rejects.toThrow(PaymentError);
     });
 
     it("détecte un webhook déjà traité (duplicate)", async () => {
       const svc = createService();
       mockProvider.verifyWebhookSignature.mockReturnValue(true);
       mockProvider.normalizeWebhookPayload.mockReturnValue(successPayload());
-      mockTransactionRepo.findByProviderTxId.mockResolvedValue(
-        mockTx({ status: "SUCCESS" })
-      );
+      mockTransactionRepo.findByProviderTxId.mockResolvedValue(mockTx({ status: "SUCCESS" }));
 
       const result = await svc.process(RAW_BODY, "sig", "1.2.3.4");
       expect(result.processed).toBe(false);

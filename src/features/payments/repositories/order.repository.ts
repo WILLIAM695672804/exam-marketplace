@@ -145,10 +145,7 @@ export class PaymentOrderRepository {
    * @param userId UUID de l'utilisateur.
    * @returns true si la commande appartient à l'utilisateur.
    */
-  async belongsToUser(
-    orderId: string,
-    userId: string
-  ): Promise<boolean> {
+  async belongsToUser(orderId: string, userId: string): Promise<boolean> {
     const count = await this.db.count({
       where: { id: orderId, userId },
     });

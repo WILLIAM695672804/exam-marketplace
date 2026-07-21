@@ -195,10 +195,7 @@ export class TransactionRepository {
    * @param id UUID de la transaction.
    * @param callbackData Données brutes du webhook (stockées pour audit).
    */
-  async saveCallbackData(
-    id: string,
-    callbackData: Prisma.InputJsonValue
-  ) {
+  async saveCallbackData(id: string, callbackData: Prisma.InputJsonValue) {
     return this.db.update({
       where: { id },
       data: { callbackData },
@@ -214,11 +211,7 @@ export class TransactionRepository {
    * @param errorBody Détail erreur optionnel.
    * @returns La transaction mise à jour.
    */
-  async incrementAttempts(
-    id: string,
-    errorCode?: string,
-    errorBody?: Prisma.InputJsonValue
-  ) {
+  async incrementAttempts(id: string, errorCode?: string, errorBody?: Prisma.InputJsonValue) {
     return this.db.update({
       where: { id },
       data: {
@@ -243,11 +236,7 @@ export class TransactionRepository {
    * @param providerRef Référence provider (optionnelle).
    * @returns La transaction mise à jour.
    */
-  async markPending(
-    id: string,
-    providerTxId: string,
-    providerRef?: string
-  ) {
+  async markPending(id: string, providerTxId: string, providerRef?: string) {
     return this.db.update({
       where: { id },
       data: {

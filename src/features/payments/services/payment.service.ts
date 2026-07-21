@@ -18,10 +18,7 @@
 
 import { initiatePaymentSchema } from "../validators/payment.schema";
 import type { InitiatePaymentInput } from "../validators/payment.schema";
-import type {
-  InitiatePaymentRequest,
-  InitiatePaymentResponse,
-} from "../dto/initiate-payment.dto";
+import type { InitiatePaymentRequest, InitiatePaymentResponse } from "../dto/initiate-payment.dto";
 import { PaymentError } from "../errors/payment.errors";
 import type { IPaymentProvider } from "../adapters/payment-provider.interface";
 import type { TransactionRepository } from "../repositories/transaction.repository";
@@ -63,10 +60,7 @@ export class PaymentService {
     // 2. Récupération de la commande
     const order = await this.orderRepo.findById(input.orderId);
     if (!order) {
-      throw new PaymentError(
-        "ORDER_NOT_FOUND",
-        `Commande ${input.orderId} introuvable.`
-      );
+      throw new PaymentError("ORDER_NOT_FOUND", `Commande ${input.orderId} introuvable.`);
     }
 
     // 3. Vérifications d'éligibilité (guards)
@@ -79,9 +73,7 @@ export class PaymentService {
     await this.guardNoPendingTransaction(input.orderId);
 
     // 5. Idempotence : clé déjà utilisée ?
-    const existing = await this.transactionRepo.findByIdempotencyKey(
-      input.idempotencyKey
-    );
+    const existing = await this.transactionRepo.findByIdempotencyKey(input.idempotencyKey);
     if (existing) {
       return {
         transactionId: existing.id,
@@ -119,10 +111,7 @@ export class PaymentService {
         reference: order.number,
         email: user.email,
         phone: user.phone ?? "",
-        name:
-          user.firstName && user.lastName
-            ? `${user.firstName} ${user.lastName}`
-            : undefined,
+        name: user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : undefined,
         redirectUrl: `${appUrl}/dashboard/commandes`,
         metadata: {
           orderId: order.id,
@@ -146,10 +135,8 @@ export class PaymentService {
       };
     } catch (error) {
       // 9. Échec technique → FAILED + incrémenter les tentatives
-      const errorCode =
-        error instanceof PaymentError ? error.code : "PROVIDER_UNREACHABLE";
-      const errorMessage =
-        error instanceof Error ? error.message : "Erreur inconnue";
+      const errorCode = error instanceof PaymentError ? error.code : "PROVIDER_UNREACHABLE";
+      const errorMessage = error instanceof Error ? error.message : "Erreur inconnue";
 
       await this.transactionRepo.markFailed(transaction.id, errorMessage);
       await this.transactionRepo.incrementAttempts(
@@ -174,22 +161,16 @@ export class PaymentService {
    * @returns Le statut actuel de la transaction la plus récente, ou null.
    */
   async verify(orderId: string) {
-    const transaction =
-      await this.transactionRepo.findLatestByOrderId(orderId);
+    const transaction = await this.transactionRepo.findLatestByOrderId(orderId);
     if (!transaction || !transaction.providerTxId) {
       return null;
     }
 
     // Vérifier auprès du provider (double vérification)
-    const providerStatus = await this.paymentProvider.verifyPayment(
-      transaction.providerTxId
-    );
+    const providerStatus = await this.paymentProvider.verifyPayment(transaction.providerTxId);
 
     // Si le provider dit SUCCESS mais notre transaction est toujours PENDING → réconcilier
-    if (
-      providerStatus.verified &&
-      transaction.status === "PENDING"
-    ) {
+    if (providerStatus.verified && transaction.status === "PENDING") {
       await this.transactionRepo.markSuccess(transaction.id);
       return {
         transactionId: transaction.id,
@@ -216,9 +197,7 @@ export class PaymentService {
   private validateInput(request: InitiatePaymentRequest): InitiatePaymentInput {
     const result = initiatePaymentSchema.safeParse(request);
     if (!result.success) {
-      const message = result.error.issues
-        .map((i) => i.message)
-        .join(", ");
+      const message = result.error.issues.map((i) => i.message).join(", ");
       throw new PaymentError("AMOUNT_INVALID", message);
     }
     return result.data;
@@ -227,15 +206,9 @@ export class PaymentService {
   /**
    * Vérifie que la commande appartient bien à l'utilisateur.
    */
-  private guardOrderBelongsToUser(
-    orderUserId: string,
-    currentUserId: string
-  ): void {
+  private guardOrderBelongsToUser(orderUserId: string, currentUserId: string): void {
     if (orderUserId !== currentUserId) {
-      throw new PaymentError(
-        "ORDER_NOT_YOURS",
-        "Cette commande ne vous appartient pas."
-      );
+      throw new PaymentError("ORDER_NOT_YOURS", "Cette commande ne vous appartient pas.");
     }
   }
 
@@ -244,10 +217,7 @@ export class PaymentService {
    */
   private guardOrderIsPending(status: string): void {
     if (status === "PAID") {
-      throw new PaymentError(
-        "ORDER_ALREADY_PAID",
-        "Cette commande a déjà été payée."
-      );
+      throw new PaymentError("ORDER_ALREADY_PAID", "Cette commande a déjà été payée.");
     }
     if (status === "CANCELLED" || status === "EXPIRED") {
       throw new PaymentError(

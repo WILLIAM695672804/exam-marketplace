@@ -30,11 +30,7 @@ function createService() {
   );
 }
 
-function mockOrderItem(
-  examPaperId: string,
-  authorId: string,
-  price: number
-) {
+function mockOrderItem(examPaperId: string, authorId: string, price: number) {
   return {
     examPaperId,
     price: { toString: () => String(price) } as never,
@@ -84,8 +80,9 @@ describe("CommissionService", () => {
       const count = await svc.calculate("tx-1", "order-1");
       expect(count).toBe(3);
 
-      const inputs = (mockCommissionRepo.createMany.mock
-        .calls[0] as never[])[0] as Array<{ teacherId: string }>;
+      const inputs = (mockCommissionRepo.createMany.mock.calls[0] as never[])[0] as Array<{
+        teacherId: string;
+      }>;
       const teacherIds = inputs.map((c: { teacherId: string }) => c.teacherId);
       expect(teacherIds).toEqual(["teacher-X", "teacher-Y", "teacher-X"]);
     });

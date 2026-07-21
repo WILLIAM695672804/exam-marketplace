@@ -22,7 +22,7 @@ const orderRepo = new PaymentOrderRepository();
 
 const providerFactory = new ProviderFactory({
   defaultProvider: "FAPSHI",
-    fapshiPaymentMode: (process.env.FAPSHI_PAYMENT_MODE ?? "DIRECT") as "DIRECT" | "INITIATE",
+  fapshiPaymentMode: (process.env.FAPSHI_PAYMENT_MODE ?? "DIRECT") as "DIRECT" | "INITIATE",
   fapshi: {
     apiUser: process.env.FAPSHI_API_USER ?? "",
     apiKey: process.env.FAPSHI_API_KEY ?? "",
@@ -67,15 +67,18 @@ export async function GET(request: Request) {
 
     if (!result) {
       return NextResponse.json(
-        { success: false, error: { code: "ORDER_NOT_FOUND", message: "Aucune transaction trouvée pour cette commande." } },
+        {
+          success: false,
+          error: {
+            code: "ORDER_NOT_FOUND",
+            message: "Aucune transaction trouvée pour cette commande.",
+          },
+        },
         { status: 404 }
       );
     }
 
-    return NextResponse.json(
-      { success: true, data: result },
-      { status: 200 }
-    );
+    return NextResponse.json({ success: true, data: result }, { status: 200 });
   } catch (error) {
     if (error instanceof PaymentError) {
       return NextResponse.json(

@@ -28,10 +28,7 @@ import type { PaymentOrderRepository } from "../repositories/order.repository";
 // ---------------------------------------------------------------------------
 
 export interface ICommissionCalculator {
-  calculate(
-    transactionId: string,
-    orderId: string
-  ): Promise<number>;
+  calculate(transactionId: string, orderId: string): Promise<number>;
 }
 
 // ---------------------------------------------------------------------------
@@ -64,15 +61,9 @@ export class WebhookService {
     _remoteIp: string
   ): Promise<WebhookProcessingResult> {
     // 1. Vérification de la signature HMAC
-    const signatureValid = this.paymentProvider.verifyWebhookSignature(
-      rawBody,
-      signatureHeader
-    );
+    const signatureValid = this.paymentProvider.verifyWebhookSignature(rawBody, signatureHeader);
     if (!signatureValid) {
-      throw new PaymentError(
-        "WEBHOOK_SIGNATURE_INVALID",
-        "Signature du webhook invalide."
-      );
+      throw new PaymentError("WEBHOOK_SIGNATURE_INVALID", "Signature du webhook invalide.");
     }
 
     // 2. Normalisation du payload (Fapshi → format interne)
@@ -80,10 +71,7 @@ export class WebhookService {
     const payload = this.paymentProvider.normalizeWebhookPayload(parsed);
 
     // 3. Idempotence : providerTxId déjà traité ?
-    const existingTx =
-      await this.transactionRepo.findByProviderTxId(
-        payload.providerTxId
-      );
+    const existingTx = await this.transactionRepo.findByProviderTxId(payload.providerTxId);
     if (existingTx && existingTx.status !== "PENDING") {
       return {
         processed: false,
@@ -92,9 +80,7 @@ export class WebhookService {
     }
 
     // 4. Récupération de la commande
-    const order = await this.orderRepo.findByNumber(
-      payload.orderReference
-    );
+    const order = await this.orderRepo.findByNumber(payload.orderReference);
     if (!order) {
       return {
         processed: false,
@@ -115,9 +101,7 @@ export class WebhookService {
       };
     }
     if (payload.currency !== "XAF") {
-      console.error(
-        `[CRITICAL] Devise webhook ${payload.currency} ≠ XAF pour ${order.number}`
-      );
+      console.error(`[CRITICAL] Devise webhook ${payload.currency} ≠ XAF pour ${order.number}`);
       return {
         processed: false,
         reason: "CURRENCY_MISMATCH",
@@ -125,9 +109,7 @@ export class WebhookService {
     }
 
     // 6. Double vérification auprès du provider
-    const verification = await this.paymentProvider.verifyPayment(
-      payload.providerTxId
-    );
+    const verification = await this.paymentProvider.verifyPayment(payload.providerTxId);
     if (!verification || verification.status !== "SUCCESS") {
       return {
         processed: false,
@@ -138,9 +120,7 @@ export class WebhookService {
     // 7. Sauvegarde du callback brut (audit)
     const txToUpdate = existingTx
       ? existingTx
-      : await this.transactionRepo.findByMerchantReference(
-          payload.orderReference
-        );
+      : await this.transactionRepo.findByMerchantReference(payload.orderReference);
 
     if (!txToUpdate) {
       return {
@@ -161,18 +141,10 @@ export class WebhookService {
         return this.handleSuccess(txToUpdate.id, order.id);
 
       case "FAILED":
-        return this.handleFailure(
-          txToUpdate.id,
-          order.id,
-          "Paiement refusé par le provider"
-        );
+        return this.handleFailure(txToUpdate.id, order.id, "Paiement refusé par le provider");
 
       case "EXPIRED":
-        return this.handleExpiry(
-          txToUpdate.id,
-          order.id,
-          "Transaction expirée chez le provider"
-        );
+        return this.handleExpiry(txToUpdate.id, order.id, "Transaction expirée chez le provider");
     }
   }
 

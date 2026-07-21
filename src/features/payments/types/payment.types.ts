@@ -19,12 +19,7 @@ export type PaymentProvider = "FAPSHI" | "NOTCHPAY" | "CAMPAY" | "STRIPE";
 // ---------------------------------------------------------------------------
 
 /** Statut d'une transaction de paiement. */
-export type PaymentStatus =
-  | "INITIATED"
-  | "PENDING"
-  | "SUCCESS"
-  | "FAILED"
-  | "EXPIRED";
+export type PaymentStatus = "INITIATED" | "PENDING" | "SUCCESS" | "FAILED" | "EXPIRED";
 
 /** Statut d'une commande en lien avec le paiement. */
 export type OrderPaymentStatus = "PENDING" | "PAID" | "CANCELLED" | "EXPIRED";

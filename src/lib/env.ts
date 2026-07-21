@@ -21,14 +21,10 @@ const envSchema = z.object({
   UPLOAD_DIR: z.string().default("uploads"),
 
   // Environnement
-  NODE_ENV: z
-    .enum(["development", "production", "test"])
-    .default("development"),
+  NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
 
   // Module Paiement — Fapshi Direct Pay
-  PAYMENT_PROVIDER: z
-    .enum(["FAPSHI", "CAMPAY", "STRIPE", "NOTCHPAY"])
-    .default("FAPSHI"),
+  PAYMENT_PROVIDER: z.enum(["FAPSHI", "CAMPAY", "STRIPE", "NOTCHPAY"]).default("FAPSHI"),
   PAYMENT_ENV: z.enum(["sandbox", "production"]).default("sandbox"),
   FAPSHI_API_USER: z.string().optional(),
   FAPSHI_API_KEY: z.string().optional(),

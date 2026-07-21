@@ -65,10 +65,7 @@ export class ProviderFactory {
   // Création
   // -----------------------------------------------------------------------
 
-  private createInstance(
-    name: PaymentProvider,
-    mode: "DIRECT" | "INITIATE"
-  ): IPaymentProvider {
+  private createInstance(name: PaymentProvider, mode: "DIRECT" | "INITIATE"): IPaymentProvider {
     switch (name) {
       case "FAPSHI": {
         if (!this.config.fapshi) {

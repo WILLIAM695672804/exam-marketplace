@@ -67,10 +67,7 @@ export class CommissionService {
    * @param orderId ID de la commande payée.
    * @returns Le nombre de commissions créées.
    */
-  async calculate(
-    transactionId: string,
-    orderId: string
-  ): Promise<number> {
+  async calculate(transactionId: string, orderId: string): Promise<number> {
     // 1. Récupérer la commande avec ses items
     const order = await this.orderRepo.findWithItems(orderId);
     if (!order) {
@@ -78,8 +75,7 @@ export class CommissionService {
     }
 
     // 2. Vérifier qu'aucune commission n'existe déjà (idempotence)
-    const alreadyExists =
-      await this.commissionRepo.hasCommission(transactionId);
+    const alreadyExists = await this.commissionRepo.hasCommission(transactionId);
     if (alreadyExists) {
       return 0; // Idempotent : déjà calculé
     }
@@ -137,10 +133,7 @@ export class CommissionService {
     }
 
     const rawPlatform = amount * this.policy.rate;
-    const platformAmount = Math.max(
-      Math.round(rawPlatform),
-      this.policy.minimumPlatformAmount
-    );
+    const platformAmount = Math.max(Math.round(rawPlatform), this.policy.minimumPlatformAmount);
     // La plateforme ne peut pas prendre plus que le montant total
     const cappedPlatform = Math.min(platformAmount, amount);
     const teacherAmount = amount - cappedPlatform;

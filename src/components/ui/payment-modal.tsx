@@ -14,12 +14,7 @@ interface PaymentModalProps {
   onSuccess: () => void;
 }
 
-export function PaymentModal({
-  paymentUrl,
-  orderId,
-  onClose,
-  onSuccess,
-}: PaymentModalProps) {
+export function PaymentModal({ paymentUrl, orderId, onClose, onSuccess }: PaymentModalProps) {
   const popupRef = useRef<Window | null>(null);
   const [status, setStatus] = useState<"opening" | "pending" | "success" | "failed">("opening");
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -145,9 +140,13 @@ export function PaymentModal({
 
         {status === "success" && (
           <div className="flex flex-col items-center gap-4 py-8">
-            <span className="material-symbols-outlined text-[48px] text-secondary">check_circle</span>
+            <span className="material-symbols-outlined text-[48px] text-secondary">
+              check_circle
+            </span>
             <p className="font-headline-sm text-primary">Paiement confirmé !</p>
-            <p className="font-body-sm text-on-surface-variant">Redirection vers vos commandes...</p>
+            <p className="font-body-sm text-on-surface-variant">
+              Redirection vers vos commandes...
+            </p>
           </div>
         )}
 

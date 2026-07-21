@@ -25,9 +25,8 @@ beforeEach(() => vi.clearAllMocks());
 
 describe("FapshiInitiatePayAdapter", () => {
   async function createAdapter() {
-    const { FapshiInitiatePayAdapter } = await import(
-      "@/features/payments/adapters/fapshi/initiate-pay.adapter"
-    );
+    const { FapshiInitiatePayAdapter } =
+      await import("@/features/payments/adapters/fapshi/initiate-pay.adapter");
     return new FapshiInitiatePayAdapter({
       apiUser: "test-user",
       apiKey: "test-key",
@@ -125,9 +124,7 @@ describe("FapshiInitiatePayAdapter", () => {
 
 describe("ProviderFactory — dual-mode", () => {
   async function getFactory(mode: "DIRECT" | "INITIATE") {
-    const { ProviderFactory } = await import(
-      "@/features/payments/adapters/provider-factory"
-    );
+    const { ProviderFactory } = await import("@/features/payments/adapters/provider-factory");
     return new ProviderFactory({
       defaultProvider: "FAPSHI",
       fapshiPaymentMode: mode,
@@ -136,18 +133,15 @@ describe("ProviderFactory — dual-mode", () => {
   }
 
   it("DIRECT → retourne FapshiAdapter (Direct Pay)", async () => {
-    const { FapshiAdapter } = await import(
-      "@/features/payments/adapters/fapshi/fapshi.adapter"
-    );
+    const { FapshiAdapter } = await import("@/features/payments/adapters/fapshi/fapshi.adapter");
     const factory = await getFactory("DIRECT");
     const provider = factory.getDefaultProvider();
     expect(provider).toBeInstanceOf(FapshiAdapter);
   });
 
   it("INITIATE → retourne FapshiInitiatePayAdapter", async () => {
-    const { FapshiInitiatePayAdapter } = await import(
-      "@/features/payments/adapters/fapshi/initiate-pay.adapter"
-    );
+    const { FapshiInitiatePayAdapter } =
+      await import("@/features/payments/adapters/fapshi/initiate-pay.adapter");
     const factory = await getFactory("INITIATE");
     const provider = factory.getDefaultProvider();
     expect(provider).toBeInstanceOf(FapshiInitiatePayAdapter);

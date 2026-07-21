@@ -76,9 +76,7 @@ export interface IPaymentProvider {
    * Initie un paiement Direct Pay chez le provider.
    * Appelé par PaymentService.initiate().
    */
-  initiatePayment(
-    request: ProviderInitiateRequest
-  ): Promise<ProviderInitiateResponse>;
+  initiatePayment(request: ProviderInitiateRequest): Promise<ProviderInitiateResponse>;
 
   /**
    * Vérifie le statut d'une transaction directement auprès du provider.
@@ -91,9 +89,7 @@ export interface IPaymentProvider {
    * Récupère le statut complet d'une transaction.
    * Utilisé par les jobs de réconciliation.
    */
-  getTransactionStatus(
-    providerTxId: string
-  ): Promise<ProviderTransactionStatus>;
+  getTransactionStatus(providerTxId: string): Promise<ProviderTransactionStatus>;
 
   // -----------------------------------------------------------------------
   // Webhook

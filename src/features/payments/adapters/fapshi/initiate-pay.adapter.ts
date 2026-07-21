@@ -74,9 +74,7 @@ export class FapshiInitiatePayAdapter implements IPaymentProvider {
    *
    * Retourne une paymentUrl vers laquelle l'utilisateur doit être redirigé.
    */
-  async initiatePayment(
-    request: ProviderInitiateRequest
-  ): Promise<ProviderInitiateResponse> {
+  async initiatePayment(request: ProviderInitiateRequest): Promise<ProviderInitiateResponse> {
     const phone = this.http.sanitizePhone(request.phone);
     const medium = request.medium ?? this.http.detectMedium(phone);
 
@@ -96,10 +94,10 @@ export class FapshiInitiatePayAdapter implements IPaymentProvider {
       redirectUrl: request.redirectUrl,
     };
 
-    const response = await this.http.fetch<FapshiInitiatePayResponse>(
-      "/initiate-pay",
-      { method: "POST", body: JSON.stringify(fapshiRequest) }
-    );
+    const response = await this.http.fetch<FapshiInitiatePayResponse>("/initiate-pay", {
+      method: "POST",
+      body: JSON.stringify(fapshiRequest),
+    });
 
     return {
       providerTxId: response.transId,
@@ -113,9 +111,7 @@ export class FapshiInitiatePayAdapter implements IPaymentProvider {
   // Vérification (GET /payment-status/{id}) — identique à Direct Pay
   // -----------------------------------------------------------------------
 
-  async verifyPayment(
-    providerTxId: string
-  ): Promise<ProviderVerifyResult> {
+  async verifyPayment(providerTxId: string): Promise<ProviderVerifyResult> {
     const response = await this.http.fetch<FapshiTransactionStatus>(
       `/payment-status/${encodeURIComponent(providerTxId)}`,
       { method: "GET" }
@@ -132,9 +128,7 @@ export class FapshiInitiatePayAdapter implements IPaymentProvider {
     };
   }
 
-  async getTransactionStatus(
-    providerTxId: string
-  ): Promise<ProviderTransactionStatus> {
+  async getTransactionStatus(providerTxId: string): Promise<ProviderTransactionStatus> {
     const response = await this.http.fetch<FapshiTransactionStatus>(
       `/payment-status/${encodeURIComponent(providerTxId)}`,
       { method: "GET" }
@@ -170,9 +164,7 @@ export class FapshiInitiatePayAdapter implements IPaymentProvider {
   // Privé
   // -----------------------------------------------------------------------
 
-  private mapStatus(
-    fapshi: FapshiTransactionStatus
-  ): ProviderTransactionStatus {
+  private mapStatus(fapshi: FapshiTransactionStatus): ProviderTransactionStatus {
     const base = {
       providerTxId: fapshi.transId,
       providerRef: fapshi.financialTransId,
@@ -181,7 +173,11 @@ export class FapshiInitiatePayAdapter implements IPaymentProvider {
     };
     switch (fapshi.status) {
       case "SUCCESSFUL":
-        return { ...base, status: "SUCCESS", paidAt: fapshi.dateConfirmed ?? new Date().toISOString() };
+        return {
+          ...base,
+          status: "SUCCESS",
+          paidAt: fapshi.dateConfirmed ?? new Date().toISOString(),
+        };
       case "CREATED":
       case "PENDING":
         return { ...base, status: "PENDING", paidAt: null };
@@ -199,9 +195,7 @@ export class FapshiInitiatePayAdapter implements IPaymentProvider {
 // Helper
 // ---------------------------------------------------------------------------
 
-function mapFapshiStatus(
-  fapshiStatus: string
-): "SUCCESS" | "FAILED" | "PENDING" | "EXPIRED" {
+function mapFapshiStatus(fapshiStatus: string): "SUCCESS" | "FAILED" | "PENDING" | "EXPIRED" {
   switch (fapshiStatus) {
     case "SUCCESSFUL":
     case "SUCCESS":

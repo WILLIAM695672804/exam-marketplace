@@ -33,9 +33,7 @@ export class FapshiWebhookValidator {
 
   constructor(config: FapshiWebhookValidatorConfig) {
     this.secret = config.webhookSecret;
-    this.signatureHeader = (
-      config.signatureHeader ?? "x-fapshi-signature"
-    ).toLowerCase();
+    this.signatureHeader = (config.signatureHeader ?? "x-fapshi-signature").toLowerCase();
   }
 
   // -----------------------------------------------------------------------
@@ -49,10 +47,7 @@ export class FapshiWebhookValidator {
    * @param headers Headers HTTP de la requête (objet ou Map).
    * @returns true si la signature est valide.
    */
-  verify(
-    rawBody: Buffer | string,
-    headers: Readonly<Record<string, string>>
-  ): boolean {
+  verify(rawBody: Buffer | string, headers: Readonly<Record<string, string>>): boolean {
     const providedSignature = this.extractSignature(headers);
     if (!providedSignature) {
       return false;
@@ -84,12 +79,8 @@ export class FapshiWebhookValidator {
    * Extrait la signature du header HTTP.
    * Cherche le header configuré (insensible à la casse).
    */
-  private extractSignature(
-    headers: Readonly<Record<string, string>>
-  ): string | null {
-    const key = Object.keys(headers).find(
-      (k) => k.toLowerCase() === this.signatureHeader
-    );
+  private extractSignature(headers: Readonly<Record<string, string>>): string | null {
+    const key = Object.keys(headers).find((k) => k.toLowerCase() === this.signatureHeader);
     return key ? (headers[key] ?? null) : null;
   }
 

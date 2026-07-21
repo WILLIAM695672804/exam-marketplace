@@ -81,9 +81,7 @@ describe("FapshiAdapter", () => {
 
   describe("providerFactory", () => {
     it("retourne le bon adapter selon le provider", async () => {
-      const { ProviderFactory } = await import(
-        "@/features/payments/adapters/provider-factory"
-      );
+      const { ProviderFactory } = await import("@/features/payments/adapters/provider-factory");
       const factory = new ProviderFactory({
         defaultProvider: "FAPSHI",
         fapshi: { apiUser: "u", apiKey: "k", webhookSecret: "s" },
@@ -94,9 +92,7 @@ describe("FapshiAdapter", () => {
     });
 
     it("réutilise la même instance (singleton)", async () => {
-      const { ProviderFactory } = await import(
-        "@/features/payments/adapters/provider-factory"
-      );
+      const { ProviderFactory } = await import("@/features/payments/adapters/provider-factory");
       const factory = new ProviderFactory({
         defaultProvider: "FAPSHI",
         fapshi: { apiUser: "u", apiKey: "k", webhookSecret: "s" },
@@ -108,16 +104,12 @@ describe("FapshiAdapter", () => {
     });
 
     it("lève une erreur pour un provider non supporté", async () => {
-      const { ProviderFactory } = await import(
-        "@/features/payments/adapters/provider-factory"
-      );
+      const { ProviderFactory } = await import("@/features/payments/adapters/provider-factory");
       const factory = new ProviderFactory({
         defaultProvider: "FAPSHI",
       });
 
-      expect(() => factory.getProvider("STRIPE" as never)).toThrow(
-        /non supporté/
-      );
+      expect(() => factory.getProvider("STRIPE" as never)).toThrow(/non supporté/);
     });
   });
 });

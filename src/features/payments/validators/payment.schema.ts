@@ -48,6 +48,4 @@ export const commissionCalculationSchema = z.object({
     .min(1),
 });
 
-export type CommissionCalculationInput = z.infer<
-  typeof commissionCalculationSchema
->;
+export type CommissionCalculationInput = z.infer<typeof commissionCalculationSchema>;

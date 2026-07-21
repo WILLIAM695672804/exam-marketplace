@@ -8,10 +8,7 @@
  */
 
 import { NextResponse } from "next/server";
-import {
-  validatePaymentConfig,
-  paymentConfig,
-} from "@/config/payment.config";
+import { validatePaymentConfig, paymentConfig } from "@/config/payment.config";
 import { ProviderFactory } from "@/features/payments/adapters/provider-factory";
 
 export async function GET() {
@@ -38,7 +35,7 @@ export async function GET() {
       defaultProvider: paymentConfig.provider,
       fapshiPaymentMode: paymentConfig.fapshiPaymentMode,
       fapshi: {
-    apiUser: process.env.FAPSHI_API_USER ?? "",
+        apiUser: process.env.FAPSHI_API_USER ?? "",
         apiKey: paymentConfig.fapshi.apiKey,
         webhookSecret: paymentConfig.fapshi.webhookSecret,
         baseUrl: paymentConfig.fapshi.baseUrl,
@@ -65,10 +62,7 @@ export async function GET() {
     return NextResponse.json(
       {
         status: "error",
-        message:
-          error instanceof Error
-            ? error.message
-            : "Configuration paiement invalide",
+        message: error instanceof Error ? error.message : "Configuration paiement invalide",
         timestamp: new Date().toISOString(),
       },
       { status: 500 }

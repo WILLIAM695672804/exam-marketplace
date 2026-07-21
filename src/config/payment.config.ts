@@ -51,22 +51,14 @@ function isPlaceholder(val: string): boolean {
 
 function buildConfig(): PaymentModuleConfig {
   const provider = (process.env.PAYMENT_PROVIDER ?? "FAPSHI") as
-    | "FAPSHI"
-    | "CAMPAY"
-    | "STRIPE"
-    | "NOTCHPAY";
+    "FAPSHI" | "CAMPAY" | "STRIPE" | "NOTCHPAY";
 
-  const environment = (process.env.PAYMENT_ENV ?? "sandbox") as
-    | "sandbox"
-    | "production";
+  const environment = (process.env.PAYMENT_ENV ?? "sandbox") as "sandbox" | "production";
 
-  const appUrl =
-    process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 
   const defaultBaseUrl =
-    environment === "production"
-      ? "https://live.fapshi.com"
-      : "https://sandbox.fapshi.com";
+    environment === "production" ? "https://live.fapshi.com" : "https://sandbox.fapshi.com";
 
   const fapshi: FapshiConfig = {
     apiKey: process.env.FAPSHI_API_KEY ?? "",
@@ -76,9 +68,7 @@ function buildConfig(): PaymentModuleConfig {
     timeoutMs: Number(process.env.FAPSHI_TIMEOUT_MS ?? 15_000),
   };
 
-  const fapshiPaymentMode = (process.env.FAPSHI_PAYMENT_MODE ?? "DIRECT") as
-    | "DIRECT"
-    | "INITIATE";
+  const fapshiPaymentMode = (process.env.FAPSHI_PAYMENT_MODE ?? "DIRECT") as "DIRECT" | "INITIATE";
 
   return { provider, fapshi, fapshiPaymentMode, appUrl, environment };
 }
@@ -95,11 +85,7 @@ export const paymentConfig: PaymentModuleConfig = buildConfig();
 
 /** Vérifie que la configuration est prête pour la production. */
 export function validatePaymentConfig(): PaymentConfigValidation {
-  const requiredVars = [
-    "FAPSHI_API_USER",
-    "FAPSHI_API_KEY",
-    "FAPSHI_WEBHOOK_SECRET",
-  ];
+  const requiredVars = ["FAPSHI_API_USER", "FAPSHI_API_KEY", "FAPSHI_WEBHOOK_SECRET"];
 
   const missingVars = requiredVars.filter((v) => {
     const val = process.env[v];

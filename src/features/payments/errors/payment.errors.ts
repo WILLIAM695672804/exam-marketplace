@@ -41,8 +41,7 @@ export const PaymentErrorCode = {
   TRANSACTION_EXPIRED: "TRANSACTION_EXPIRED",
 } as const;
 
-export type PaymentErrorCode =
-  (typeof PaymentErrorCode)[keyof typeof PaymentErrorCode];
+export type PaymentErrorCode = (typeof PaymentErrorCode)[keyof typeof PaymentErrorCode];
 
 // ---------------------------------------------------------------------------
 // Mapping HTTP

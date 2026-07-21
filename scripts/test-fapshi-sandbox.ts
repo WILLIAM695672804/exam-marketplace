@@ -11,7 +11,9 @@ async function test(adapter: FapshiAdapter, phone: string, label: string) {
   console.log(`\n${SEP}`);
   console.log(`📋 ${label}`);
   console.log(`   phone  : ${phone}`);
-  console.log(`   medium : auto-détecté (${phone.replace(/\D/g, "").slice(-9).startsWith("69") ? "orange money" : "mobile money"})`);
+  console.log(
+    `   medium : auto-détecté (${phone.replace(/\D/g, "").slice(-9).startsWith("69") ? "orange money" : "mobile money"})`
+  );
   console.log(SEP);
 
   try {
@@ -49,7 +51,9 @@ async function main() {
   console.log(`   Env     : ${paymentConfig.environment}`);
 
   const validation = validatePaymentConfig();
-  console.log(`   Config  : ${validation.valid ? "✅ valide" : "⚠️ " + validation.missingVars.join(", ")}`);
+  console.log(
+    `   Config  : ${validation.valid ? "✅ valide" : "⚠️ " + validation.missingVars.join(", ")}`
+  );
 
   const adapter = new FapshiAdapter({
     apiUser: paymentConfig.fapshi.apiUser,
@@ -67,7 +71,9 @@ async function main() {
   await test(adapter, "670000001", "MTN ÉCHEC attendu (670000001)");
 
   console.log(`\n${SEP}`);
-  console.log("RÉSUMÉ : Payload envoyé = { amount, currency, reference, email, phone, medium, name, externalId, message, meta }");
+  console.log(
+    "RÉSUMÉ : Payload envoyé = { amount, currency, reference, email, phone, medium, name, externalId, message, meta }"
+  );
   console.log(SEP);
 }
 

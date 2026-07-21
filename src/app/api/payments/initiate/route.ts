@@ -22,7 +22,7 @@ const orderRepo = new PaymentOrderRepository();
 
 const providerFactory = new ProviderFactory({
   defaultProvider: "FAPSHI",
-    fapshiPaymentMode: (process.env.FAPSHI_PAYMENT_MODE ?? "DIRECT") as "DIRECT" | "INITIATE",
+  fapshiPaymentMode: (process.env.FAPSHI_PAYMENT_MODE ?? "DIRECT") as "DIRECT" | "INITIATE",
   fapshi: {
     apiUser: process.env.FAPSHI_API_USER ?? "",
     apiKey: process.env.FAPSHI_API_KEY ?? "",
@@ -70,10 +70,7 @@ export async function POST(request: Request) {
       request.headers.get("user-agent") ?? undefined
     );
 
-    return NextResponse.json(
-      { success: true, data: result },
-      { status: 201 }
-    );
+    return NextResponse.json({ success: true, data: result }, { status: 201 });
   } catch (error) {
     return handleError(error);
   }
