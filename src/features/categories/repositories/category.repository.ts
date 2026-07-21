@@ -17,7 +17,10 @@ export const categoryRepository = {
   },
 
   create(data: { name: string; slug: string; description?: string }) {
-    return prisma.category.create({ data });
+    return prisma.category.create({
+      data,
+      include: { _count: { select: { competitions: true } } },
+    });
   },
 
   update(id: string, data: { name?: string; slug?: string; description?: string }) {

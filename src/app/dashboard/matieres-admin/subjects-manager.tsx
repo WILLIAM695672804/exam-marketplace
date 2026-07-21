@@ -192,7 +192,7 @@ export function SubjectsManager({
                   {s.competition?.name ?? "—"}
                 </td>
                 <td className="px-6 py-4 font-body-sm text-on-surface-variant">
-                  {s._count.examPapers}
+                  {s._count?.examPapers ?? 0}
                 </td>
                 <td className="px-6 py-4 text-right">
                   <button

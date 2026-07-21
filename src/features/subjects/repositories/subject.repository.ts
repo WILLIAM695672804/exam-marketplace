@@ -17,7 +17,10 @@ export const subjectRepository = {
   },
 
   create(data: { name: string; slug: string; competitionId: string }) {
-    return prisma.subject.create({ data });
+    return prisma.subject.create({
+      data,
+      include: { competition: true, _count: { select: { examPapers: true } } },
+    });
   },
 
   update(id: string, data: { name?: string; slug?: string }) {

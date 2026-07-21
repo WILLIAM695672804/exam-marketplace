@@ -212,10 +212,10 @@ export function CompetitionsManager({
                   {comp.category?.name ?? "—"}
                 </td>
                 <td className="px-6 py-4 font-body-sm text-on-surface-variant">
-                  {comp._count.subjects}
+                  {comp._count?.subjects ?? 0}
                 </td>
                 <td className="px-6 py-4 font-body-sm text-on-surface-variant">
-                  {comp._count.examPapers}
+                  {comp._count?.examPapers ?? 0}
                 </td>
                 <td className="px-6 py-4 text-right">
                   <button

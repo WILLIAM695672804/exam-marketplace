@@ -17,7 +17,10 @@ export const competitionRepository = {
   },
 
   create(data: { name: string; slug: string; categoryId: string; organisme?: string }) {
-    return prisma.competition.create({ data });
+    return prisma.competition.create({
+      data,
+      include: { category: true, _count: { select: { subjects: true, examPapers: true } } },
+    });
   },
 
   update(id: string, data: { name?: string; slug?: string; organisme?: string }) {
