@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { formatPrice } from "@/lib/utils";
 
 interface ExamDetail {
   id: string;
@@ -66,9 +67,9 @@ export default function EpreuveDetailPage() {
 
   const price =
     selectedOption === "correction" && exam?.priceWithCorrection
-      ? `$${Number(exam.priceWithCorrection).toFixed(2)}`
+      ? formatPrice(exam.priceWithCorrection)
       : exam
-        ? `$${Number(exam.price).toFixed(2)}`
+        ? formatPrice(exam.price)
         : "...";
 
   async function handleAddToCart() {
@@ -208,7 +209,7 @@ export default function EpreuveDetailPage() {
                 </div>
               </div>
               <span className="font-body-lg text-primary font-bold">
-                ${Number(exam.price).toFixed(2)}
+                {formatPrice(exam.price)}
               </span>
             </label>
 
@@ -230,7 +231,7 @@ export default function EpreuveDetailPage() {
                   </div>
                 </div>
                 <span className="font-body-lg text-primary font-bold">
-                  ${Number(exam.priceWithCorrection).toFixed(2)}
+                  {formatPrice(exam.priceWithCorrection)}
                 </span>
               </label>
             )}

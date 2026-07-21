@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { examRepository } from "@/features/exams/repositories/exam.repository";
+import { formatPrice } from "@/lib/utils";
 
 export default async function MesEpreuvesPage() {
   const session = await auth();
@@ -85,7 +86,7 @@ export default async function MesEpreuvesPage() {
                       </span>
                     </td>
                     <td className="px-6 py-4 font-body-sm text-on-surface-variant">
-                      ${Number(exam.price).toFixed(2)}
+                      {formatPrice(exam.price)}
                     </td>
                     <td className="px-6 py-4 font-body-sm text-on-surface-variant">
                       {exam._count.orderItems}

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { examRepository } from "@/features/exams/repositories/exam.repository";
 import { categoryRepository } from "@/features/categories/repositories/category.repository";
+import { formatPrice } from "@/lib/utils";
 
 const CATEGORY_ICONS: Record<string, string> = {
   finance: "account_balance",
@@ -217,7 +218,7 @@ export default async function HomePage() {
                   </p>
                   <div className="flex justify-between items-center mt-auto pt-4 border-t border-outline-variant">
                     <span className="font-body-lg text-body-lg font-bold text-primary">
-                      ${Number(exam.price).toFixed(2)}
+                      {formatPrice(exam.price)}
                     </span>
                     <span className="font-label-caps text-label-caps text-primary border-b border-secondary hover:text-secondary transition-colors pb-1 inline-flex items-center gap-1">
                       Voir l&apos;epreuve{" "}

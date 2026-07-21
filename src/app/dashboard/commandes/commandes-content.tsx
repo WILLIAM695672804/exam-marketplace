@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { formatPrice } from "@/lib/utils";
 import { AlertModal } from "@/components/ui/alert-modal";
 
 interface OrderItem {
@@ -123,7 +124,7 @@ export function CommandesContent() {
                 </div>
                 <div className="flex flex-col md:items-end gap-3">
                   <span className="font-headline-sm text-headline-sm text-primary">
-                    ${Number(order.totalAmount).toFixed(2)}
+                    {formatPrice(order.totalAmount)}
                   </span>
                   <button className="py-2 px-6 bg-primary text-on-primary font-label-caps text-label-caps uppercase hover:bg-inverse-surface transition-colors">
                     Payer maintenant
@@ -154,7 +155,7 @@ export function CommandesContent() {
                       Achete le {new Date(order.createdAt).toLocaleDateString("fr")}
                     </p>
                     <p className="font-body-md text-body-md text-primary font-medium">
-                      Total: ${Number(order.totalAmount).toFixed(2)}
+                      Total: {formatPrice(order.totalAmount)}
                     </p>
                   </div>
                 </div>
@@ -180,7 +181,7 @@ export function CommandesContent() {
                           </span>
                         </div>
                         <p className="font-body-sm text-body-sm text-on-surface-variant mt-2">
-                          ${Number(item.price).toFixed(2)}
+                          {formatPrice(item.price)}
                         </p>
                       </div>
                       <div className="flex flex-col md:items-end justify-center gap-3 shrink-0">

@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { prisma } from "@/lib/prisma";
+import { formatPrice } from "@/lib/utils";
 import { cartRepository } from "@/features/cart/repositories/cart.repository";
 
 export default async function DashboardPage() {
@@ -77,7 +78,7 @@ export default async function DashboardPage() {
           },
           {
             label: "Revenu",
-            value: `$${Number(teacherRevenue._sum.amount ?? 0).toFixed(0)}`,
+            value: formatPrice(teacherRevenue._sum.amount ?? 0),
             icon: "attach_money",
             metric: "Metrique Enseignant",
           },
@@ -87,7 +88,7 @@ export default async function DashboardPage() {
       ? [
           {
             label: "Revenu Plateforme",
-            value: `$${Number(revenueTotal._sum.amount ?? 0).toFixed(0)}`,
+            value: formatPrice(revenueTotal._sum.amount ?? 0),
             icon: "payments",
             metric: "Metrique Admin",
           },
@@ -215,14 +216,13 @@ export default async function DashboardPage() {
                             {roles.includes("ADMIN") && order.user
                               ? `${order.user.firstName} ${order.user.lastName} — `
                               : ""}
-                            {order.items.length} epreuve{order.items.length > 1 ? "s" : ""} — $
-                            {Number(order.totalAmount).toFixed(0)} FCFA
+                            {order.items.length} epreuve{order.items.length > 1 ? "s" : ""} — {formatPrice(order.totalAmount)}
                           </div>
                         </div>
                       </div>
                       <div className="flex flex-col items-end gap-1">
                         <span className="text-body-md font-body-md">
-                          ${Number(order.totalAmount).toFixed(2)}
+                          {formatPrice(order.totalAmount)}
                         </span>
                         <span
                           className={`px-2 py-1 text-label-caps font-label-caps uppercase border border-outline-variant ${order.status === "PAID" ? "bg-secondary-fixed text-on-secondary-fixed" : order.status === "PENDING" ? "bg-surface-container text-on-surface-variant" : "bg-error-container text-on-error-container"}`}

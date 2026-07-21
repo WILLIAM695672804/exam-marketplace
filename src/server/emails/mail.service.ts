@@ -17,7 +17,7 @@ export const mailService = {
     if (!user || !order) return;
 
     const itemsList = order.items
-      .map((item) => `- ${item.examPaper.title} (${item.price})`)
+      .map((item) => `- ${item.examPaper.title} (${item.price} FCFA)`)
       .join("\n");
 
     try {

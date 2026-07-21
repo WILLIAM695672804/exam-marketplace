@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { formatPrice } from "@/lib/utils";
 
 interface CartItem {
   id: string;
@@ -106,15 +107,15 @@ export function PanierContent() {
                   <h3 className="font-headline-sm text-primary">{item.examPaper.title}</h3>
                   <div className="flex items-center gap-3">
                     <span className="font-body-lg text-primary">
-                      $
-                      {(item.withCorrection && item.examPaper.priceWithCorrection
-                        ? Number(item.examPaper.priceWithCorrection)
-                        : Number(item.examPaper.price)
-                      ).toFixed(2)}
+                      {formatPrice(
+                        item.withCorrection && item.examPaper.priceWithCorrection
+                          ? item.examPaper.priceWithCorrection
+                          : item.examPaper.price
+                      )}
                     </span>
                     {item.examPaper.priceWithCorrection && (
                       <span className="font-label-caps text-label-caps text-secondary">
-                        + Corrige (${Number(item.examPaper.priceWithCorrection).toFixed(2)})
+                        + Corrige ({formatPrice(item.examPaper.priceWithCorrection)})
                       </span>
                     )}
                   </div>
@@ -150,7 +151,7 @@ export function PanierContent() {
             </h3>
             <div className="flex justify-between mb-4">
               <span className="font-body-md text-on-surface-variant">Sous-total</span>
-              <span className="font-body-md text-primary">${total.toFixed(2)}</span>
+              <span className="font-body-md text-primary">{formatPrice(total)}</span>
             </div>
             <div className="flex justify-between mb-6">
               <span className="font-body-md text-on-surface-variant">Commission</span>
@@ -158,7 +159,7 @@ export function PanierContent() {
             </div>
             <div className="flex justify-between font-bold mb-8 pt-4 border-t border-outline-variant">
               <span className="font-headline-sm text-primary">Total</span>
-              <span className="font-headline-sm text-primary">${total.toFixed(2)}</span>
+              <span className="font-headline-sm text-primary">{formatPrice(total)}</span>
             </div>
             <button
               onClick={async () => {

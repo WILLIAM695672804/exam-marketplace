@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import { formatPrice } from "@/lib/utils";
 
 interface ExamItem {
   id: string;
@@ -17,52 +18,95 @@ interface ExamItem {
   _count: { orderItems: number };
 }
 
-const CATEGORIES = [
-  "Finance & Comptabilite",
-  "Droit & Juridique",
-  "Medecine",
-  "Ingenierie",
-  "Informatique",
-];
+interface Category {
+  id: string;
+  name: string;
+  slug: string;
+}
 
-const COMPETITIONS = [
-  { value: "", label: "Selectionner un concours" },
-  { value: "cfa", label: "CFA Level I" },
-  { value: "bar", label: "Barreau (NY)" },
-  { value: "mcat", label: "MCAT" },
-  { value: "usmle", label: "USMLE" },
-];
+interface Competition {
+  id: string;
+  name: string;
+}
 
-const SUBJECTS = [
-  "Finance d'entreprise",
-  "Contrats",
-  "Biologie",
-  "Ethique",
-  "Methodes quantitatives",
-  "Droit constitutionnel",
-];
+interface Subject {
+  id: string;
+  name: string;
+}
+
+const PRICE_MAX = 500;
 
 export default function CataloguePage() {
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [selectedCompetition, setSelectedCompetition] = useState("");
-  const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
-  const [priceRange, setPriceRange] = useState(500);
+  // Donnees dynamiques pour les filtres
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [competitions, setCompetitions] = useState<Competition[]>([]);
+  const [subjects, setSubjects] = useState<Subject[]>([]);
+
+  // Filtres
+  const [selectedCategoryId, setSelectedCategoryId] = useState("");
+  const [selectedCompetitionId, setSelectedCompetitionId] = useState("");
+  const [selectedSubjectId, setSelectedSubjectId] = useState("");
+  const [priceRange, setPriceRange] = useState(PRICE_MAX);
   const [correctionFilter, setCorrectionFilter] = useState("Tout");
   const [sortBy, setSortBy] = useState("popularity");
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
 
+  // Resultats
   const [exams, setExams] = useState<ExamItem[]>([]);
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [loading, setLoading] = useState(true);
 
+  // Charger les categories au montage
+  useEffect(() => {
+    fetch("/api/categories")
+      .then((res) => res.json())
+      .then((data: Category[]) => setCategories(data))
+      .catch(() => {});
+  }, []);
+
+  // Recharger les concours quand la categorie change
+  useEffect(() => {
+    const params = new URLSearchParams();
+    if (selectedCategoryId) params.set("categoryId", selectedCategoryId);
+    fetch(`/api/concours?${params}`)
+      .then((res) => res.json())
+      .then((data: Competition[]) => {
+        setCompetitions(data);
+        // Reinitialiser le concours selectionne s'il ne fait plus partie de la liste
+        if (selectedCompetitionId && !data.some((c) => c.id === selectedCompetitionId)) {
+          setSelectedCompetitionId("");
+        }
+      })
+      .catch(() => {});
+  }, [selectedCategoryId]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Recharger les matieres quand le concours change
+  useEffect(() => {
+    const params = new URLSearchParams();
+    if (selectedCompetitionId) params.set("competitionId", selectedCompetitionId);
+    fetch(`/api/subjects?${params}`)
+      .then((res) => res.json())
+      .then((data: Subject[]) => {
+        setSubjects(data);
+        // Reinitialiser la matiere si elle ne fait plus partie de la liste
+        if (selectedSubjectId && !data.some((s) => s.id === selectedSubjectId)) {
+          setSelectedSubjectId("");
+        }
+      })
+      .catch(() => {});
+  }, [selectedCompetitionId]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Rechercher les epreuves
   const fetchExams = useCallback(async () => {
     setLoading(true);
     const params = new URLSearchParams();
     if (searchQuery) params.set("search", searchQuery);
-    if (selectedCompetition) params.set("competitionId", selectedCompetition);
-    if (priceRange < 500) params.set("maxPrice", String(priceRange));
+    if (selectedCategoryId) params.set("categoryId", selectedCategoryId);
+    if (selectedCompetitionId) params.set("competitionId", selectedCompetitionId);
+    if (selectedSubjectId) params.set("subjectId", selectedSubjectId);
+    if (priceRange < PRICE_MAX) params.set("maxPrice", String(priceRange));
     params.set(
       "sortBy",
       sortBy === "popularity"
@@ -83,36 +127,29 @@ export default function CataloguePage() {
       setTotal(data.total);
       setTotalPages(data.totalPages);
     } catch {
-      // API inaccessible, garder les donnees precedentes
+      // API inaccessible
     } finally {
       setLoading(false);
     }
-  }, [searchQuery, selectedCompetition, priceRange, sortBy, currentPage]);
+  }, [
+    searchQuery,
+    selectedCategoryId,
+    selectedCompetitionId,
+    selectedSubjectId,
+    priceRange,
+    sortBy,
+    currentPage,
+  ]);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- fetchExams is an async data fetcher that sets state in callbacks, not synchronously
     void fetchExams();
   }, [fetchExams]);
 
-  function toggleCategory(cat: string) {
-    setSelectedCategories((prev) =>
-      prev.includes(cat) ? prev.filter((c) => c !== cat) : [...prev, cat]
-    );
-    setCurrentPage(1);
-  }
-
-  function toggleSubject(subj: string) {
-    setSelectedSubjects((prev) =>
-      prev.includes(subj) ? prev.filter((s) => s !== subj) : [...prev, subj]
-    );
-    setCurrentPage(1);
-  }
-
   function clearFilters() {
-    setSelectedCategories([]);
-    setSelectedCompetition("");
-    setSelectedSubjects([]);
-    setPriceRange(500);
+    setSelectedCategoryId("");
+    setSelectedCompetitionId("");
+    setSelectedSubjectId("");
+    setPriceRange(PRICE_MAX);
     setCorrectionFilter("Tout");
     setSearchQuery("");
     setSortBy("popularity");
@@ -132,74 +169,97 @@ export default function CataloguePage() {
       <aside className="w-full lg:w-1/4 flex-shrink-0 space-y-stack-lg border-r border-outline-variant pr-gutter pb-section-gap lg:pb-0 hidden md:block">
         <h2 className="font-headline-sm text-headline-sm mb-stack-lg">Filtres</h2>
 
+        {/* Categories */}
         <div className="space-y-stack-sm border-b border-outline-variant pb-stack-md">
           <h3 className="font-label-caps text-label-caps text-on-surface-variant uppercase">
             Categorie
           </h3>
           <div className="space-y-2">
-            {CATEGORIES.map((cat) => (
-              <label key={cat} className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={selectedCategories.includes(cat)}
-                  onChange={() => toggleCategory(cat)}
-                  className="border-outline-variant text-primary focus:ring-primary w-4 h-4 rounded-none"
-                />
-                <span className="font-body-sm text-body-sm">{cat}</span>
-              </label>
-            ))}
+            {categories.length === 0 ? (
+              <span className="font-body-sm text-on-surface-variant italic">Chargement...</span>
+            ) : (
+              categories.map((cat) => (
+                <label key={cat.id} className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="category"
+                    checked={selectedCategoryId === cat.id}
+                    onChange={() => {
+                      setSelectedCategoryId(cat.id);
+                      setCurrentPage(1);
+                    }}
+                    className="border-outline-variant text-primary focus:ring-primary w-4 h-4"
+                  />
+                  <span className="font-body-sm text-body-sm">{cat.name}</span>
+                </label>
+              ))
+            )}
           </div>
         </div>
 
+        {/* Concours */}
         <div className="space-y-stack-sm border-b border-outline-variant pb-stack-md">
           <h3 className="font-label-caps text-label-caps text-on-surface-variant uppercase">
             Concours
           </h3>
           <select
-            value={selectedCompetition}
+            value={selectedCompetitionId}
             onChange={(e) => {
-              setSelectedCompetition(e.target.value);
+              setSelectedCompetitionId(e.target.value);
               setCurrentPage(1);
             }}
             className="w-full bg-transparent border-b border-outline-variant pb-2 font-body-sm text-body-sm focus:outline-none focus:border-primary focus:ring-0 rounded-none"
           >
-            {COMPETITIONS.map((comp) => (
-              <option key={comp.value} value={comp.value}>
-                {comp.label}
+            <option value="">Tous les concours</option>
+            {competitions.map((comp) => (
+              <option key={comp.id} value={comp.id}>
+                {comp.name}
               </option>
             ))}
           </select>
         </div>
 
+        {/* Matieres */}
         <div className="space-y-stack-sm border-b border-outline-variant pb-stack-md">
           <h3 className="font-label-caps text-label-caps text-on-surface-variant uppercase">
             Matiere
           </h3>
           <div className="space-y-2 max-h-48 overflow-y-auto pr-2">
-            {SUBJECTS.map((subj) => (
-              <label key={subj} className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={selectedSubjects.includes(subj)}
-                  onChange={() => toggleSubject(subj)}
-                  className="border-outline-variant text-primary focus:ring-primary w-4 h-4 rounded-none"
-                />
-                <span className="font-body-sm text-body-sm">{subj}</span>
-              </label>
-            ))}
+            {subjects.length === 0 ? (
+              <span className="font-body-sm text-on-surface-variant italic">
+                {selectedCompetitionId ? "Aucune matiere" : "Selectionnez un concours"}
+              </span>
+            ) : (
+              subjects.map((subj) => (
+                <label key={subj.id} className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="subject"
+                    checked={selectedSubjectId === subj.id}
+                    onChange={() => {
+                      setSelectedSubjectId(subj.id);
+                      setCurrentPage(1);
+                    }}
+                    className="border-outline-variant text-primary focus:ring-primary w-4 h-4"
+                  />
+                  <span className="font-body-sm text-body-sm">{subj.name}</span>
+                </label>
+              ))
+            )}
           </div>
         </div>
 
+        {/* Prix */}
         <div className="space-y-stack-sm border-b border-outline-variant pb-stack-md">
           <h3 className="font-label-caps text-label-caps text-on-surface-variant uppercase flex justify-between">
             <span>Prix</span>
-            <span>$0 - ${priceRange}</span>
+            <span>0 FCFA - {formatPrice(priceRange)}</span>
           </h3>
           <div className="pt-2">
             <input
               type="range"
               className="w-full"
-              max={500}
+              max={PRICE_MAX}
               min={0}
               value={priceRange}
               onChange={(e) => {
@@ -210,6 +270,7 @@ export default function CataloguePage() {
           </div>
         </div>
 
+        {/* Corrige */}
         <div className="space-y-stack-sm pb-stack-md">
           <h3 className="font-label-caps text-label-caps text-on-surface-variant uppercase">
             Corrige
@@ -312,7 +373,7 @@ export default function CataloguePage() {
                 </div>
                 <h3 className="font-headline-sm mb-2 line-clamp-2 leading-tight">{exam.title}</h3>
                 <div className="flex items-center justify-between mt-auto pt-4">
-                  <span className="font-body-lg font-bold">${Number(exam.price).toFixed(2)}</span>
+                  <span className="font-body-lg font-bold">{formatPrice(exam.price)}</span>
                 </div>
               </Link>
             ))}

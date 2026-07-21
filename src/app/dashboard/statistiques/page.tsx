@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { prisma } from "@/lib/prisma";
+import { formatPrice } from "@/lib/utils";
 import { StatsDownloads } from "./stats-downloads";
 
 export default async function StatistiquesPage() {
@@ -41,7 +42,7 @@ export default async function StatistiquesPage() {
             { label: "Utilisateurs", value: totalUsers },
             { label: "Epreuves", value: totalExams },
             { label: "Commandes", value: totalOrders },
-            { label: "Revenu", value: `$${Number(revenue._sum.amount ?? 0).toFixed(0)}` },
+            { label: "Revenu", value: formatPrice(revenue._sum.amount ?? 0) },
             { label: "Telechargements", value: totalDownloads },
           ].map((stat) => (
             <div
@@ -88,7 +89,7 @@ export default async function StatistiquesPage() {
                     {trx.order?.number ?? "N/A"}
                   </td>
                   <td className="px-6 py-4 font-body-md text-primary">
-                    ${Number(trx.amount).toFixed(2)}
+                    {formatPrice(trx.amount)}
                   </td>
                   <td className="px-6 py-4">
                     <span
