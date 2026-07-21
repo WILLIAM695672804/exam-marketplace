@@ -216,7 +216,8 @@ export default async function DashboardPage() {
                             {roles.includes("ADMIN") && order.user
                               ? `${order.user.firstName} ${order.user.lastName} — `
                               : ""}
-                            {order.items.length} epreuve{order.items.length > 1 ? "s" : ""} — {formatPrice(order.totalAmount)}
+                            {order.items.length} epreuve{order.items.length > 1 ? "s" : ""} —{" "}
+                            {formatPrice(order.totalAmount)}
                           </div>
                         </div>
                       </div>

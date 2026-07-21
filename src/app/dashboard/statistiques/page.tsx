@@ -88,9 +88,7 @@ export default async function StatistiquesPage() {
                   <td className="px-6 py-4 font-body-sm text-on-surface-variant">
                     {trx.order?.number ?? "N/A"}
                   </td>
-                  <td className="px-6 py-4 font-body-md text-primary">
-                    {formatPrice(trx.amount)}
-                  </td>
+                  <td className="px-6 py-4 font-body-md text-primary">{formatPrice(trx.amount)}</td>
                   <td className="px-6 py-4">
                     <span
                       className={`px-2 py-1 font-label-caps text-[10px] uppercase ${trx.status === "SUCCESS" ? "bg-secondary-fixed text-on-secondary-fixed" : trx.status === "FAILED" ? "bg-error-container text-on-error-container" : "bg-surface-container text-on-surface-variant"}`}

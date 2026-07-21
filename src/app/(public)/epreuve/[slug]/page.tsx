@@ -208,9 +208,7 @@ export default function EpreuveDetailPage() {
                   </p>
                 </div>
               </div>
-              <span className="font-body-lg text-primary font-bold">
-                {formatPrice(exam.price)}
-              </span>
+              <span className="font-body-lg text-primary font-bold">{formatPrice(exam.price)}</span>
             </label>
 
             {exam.priceWithCorrection && (

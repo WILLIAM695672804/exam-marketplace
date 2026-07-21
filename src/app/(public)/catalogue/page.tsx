@@ -142,6 +142,7 @@ export default function CataloguePage() {
   ]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- fetchExams est un fetcher async, le setState est dans le .then()
     void fetchExams();
   }, [fetchExams]);
 
