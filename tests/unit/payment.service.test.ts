@@ -66,10 +66,20 @@ function createService() {
 const VALID_UUID = "550e8400-e29b-41d4-a716-446655440000";
 const VALID_IDEM_KEY = "idem-key-1234567890";
 
+function mockCustomer(overrides: Record<string, unknown> = {}) {
+  return {
+    ownerType: "USER" as const,
+    email: "test@example.com",
+    userId: "user-1",
+    ...overrides,
+  };
+}
+
 function mockOrder(overrides: Record<string, unknown> = {}) {
   return {
     id: VALID_UUID,
     number: "ORD-ABC123",
+    ownerType: "USER",
     userId: "user-1",
     totalAmount: { toString: () => "1500" } as never,
     status: "PENDING",
@@ -122,7 +132,7 @@ describe("PaymentService", () => {
 
       const result = await svc.initiate(
         { orderId: VALID_UUID, idempotencyKey: VALID_IDEM_KEY },
-        "user-1"
+        mockCustomer()
       );
 
       expect(result.transactionId).toBe("tx-1");
@@ -147,7 +157,7 @@ describe("PaymentService", () => {
       });
       mockTransactionRepo.markPending.mockResolvedValue({});
 
-      await svc.initiate({ orderId: VALID_UUID, idempotencyKey: VALID_IDEM_KEY }, "user-1");
+      await svc.initiate({ orderId: VALID_UUID, idempotencyKey: VALID_IDEM_KEY }, mockCustomer());
 
       expect(mockTransactionRepo.create).toHaveBeenCalledWith(
         expect.objectContaining({ merchantReference: "ORD-XYZ999" })
@@ -163,7 +173,7 @@ describe("PaymentService", () => {
       mockOrderRepo.findById.mockResolvedValue(null);
 
       await expect(
-        svc.initiate({ orderId: "bad-order", idempotencyKey: VALID_IDEM_KEY }, "user-1")
+        svc.initiate({ orderId: "bad-order", idempotencyKey: VALID_IDEM_KEY }, mockCustomer())
       ).rejects.toThrow(PaymentError);
     });
 
@@ -172,7 +182,7 @@ describe("PaymentService", () => {
       mockOrderRepo.findById.mockResolvedValue(mockOrder({ userId: "other-user" }));
 
       await expect(
-        svc.initiate({ orderId: VALID_UUID, idempotencyKey: VALID_IDEM_KEY }, "user-1")
+        svc.initiate({ orderId: VALID_UUID, idempotencyKey: VALID_IDEM_KEY }, mockCustomer())
       ).rejects.toThrow(PaymentError);
     });
 
@@ -181,7 +191,7 @@ describe("PaymentService", () => {
       mockOrderRepo.findById.mockResolvedValue(mockOrder({ status: "PAID" }));
 
       await expect(
-        svc.initiate({ orderId: VALID_UUID, idempotencyKey: VALID_IDEM_KEY }, "user-1")
+        svc.initiate({ orderId: VALID_UUID, idempotencyKey: VALID_IDEM_KEY }, mockCustomer())
       ).rejects.toThrow(PaymentError);
     });
 
@@ -190,7 +200,7 @@ describe("PaymentService", () => {
       mockOrderRepo.findById.mockResolvedValue(mockOrder({ status: "CANCELLED" }));
 
       await expect(
-        svc.initiate({ orderId: VALID_UUID, idempotencyKey: VALID_IDEM_KEY }, "user-1")
+        svc.initiate({ orderId: VALID_UUID, idempotencyKey: VALID_IDEM_KEY }, mockCustomer())
       ).rejects.toThrow(PaymentError);
     });
 
@@ -199,7 +209,7 @@ describe("PaymentService", () => {
       mockOrderRepo.findById.mockResolvedValue(mockOrder({ status: "EXPIRED" }));
 
       await expect(
-        svc.initiate({ orderId: VALID_UUID, idempotencyKey: VALID_IDEM_KEY }, "user-1")
+        svc.initiate({ orderId: VALID_UUID, idempotencyKey: VALID_IDEM_KEY }, mockCustomer())
       ).rejects.toThrow(PaymentError);
     });
 
@@ -209,7 +219,7 @@ describe("PaymentService", () => {
       mockTransactionRepo.hasSuccessTransaction.mockResolvedValue(true);
 
       await expect(
-        svc.initiate({ orderId: VALID_UUID, idempotencyKey: VALID_IDEM_KEY }, "user-1")
+        svc.initiate({ orderId: VALID_UUID, idempotencyKey: VALID_IDEM_KEY }, mockCustomer())
       ).rejects.toThrow(PaymentError);
     });
 
@@ -220,7 +230,7 @@ describe("PaymentService", () => {
       mockTransactionRepo.hasPendingTransaction.mockResolvedValue(true);
 
       await expect(
-        svc.initiate({ orderId: VALID_UUID, idempotencyKey: VALID_IDEM_KEY }, "user-1")
+        svc.initiate({ orderId: VALID_UUID, idempotencyKey: VALID_IDEM_KEY }, mockCustomer())
       ).rejects.toThrow(PaymentError);
     });
 
@@ -231,7 +241,7 @@ describe("PaymentService", () => {
       );
 
       await expect(
-        svc.initiate({ orderId: VALID_UUID, idempotencyKey: VALID_IDEM_KEY }, "user-1")
+        svc.initiate({ orderId: VALID_UUID, idempotencyKey: VALID_IDEM_KEY }, mockCustomer())
       ).rejects.toThrow(PaymentError);
     });
 
@@ -250,7 +260,7 @@ describe("PaymentService", () => {
 
       const result = await svc.initiate(
         { orderId: VALID_UUID, idempotencyKey: VALID_IDEM_KEY },
-        "user-1"
+        mockCustomer()
       );
 
       expect(result.transactionId).toBe("tx-existing");
@@ -276,7 +286,7 @@ describe("PaymentService", () => {
 
       const result = await svc.initiate(
         { orderId: VALID_UUID, idempotencyKey: VALID_IDEM_KEY },
-        "user-1"
+        mockCustomer()
       );
 
       expect(result.status).toBe("FAILED");
@@ -297,7 +307,7 @@ describe("PaymentService", () => {
 
       const result = await svc.initiate(
         { orderId: VALID_UUID, idempotencyKey: VALID_IDEM_KEY },
-        "user-1"
+        mockCustomer()
       );
 
       expect(result.status).toBe("FAILED");
@@ -313,7 +323,7 @@ describe("PaymentService", () => {
       const svc = createService();
 
       await expect(
-        svc.initiate({ orderId: "not-a-uuid", idempotencyKey: VALID_IDEM_KEY }, "user-1")
+        svc.initiate({ orderId: "not-a-uuid", idempotencyKey: VALID_IDEM_KEY }, mockCustomer())
       ).rejects.toThrow(PaymentError);
     });
 
@@ -323,7 +333,7 @@ describe("PaymentService", () => {
       await expect(
         svc.initiate(
           { orderId: "00000000-0000-0000-0000-000000000001", idempotencyKey: "short" },
-          "user-1"
+          mockCustomer()
         )
       ).rejects.toThrow(PaymentError);
     });

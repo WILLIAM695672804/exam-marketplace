@@ -3,6 +3,7 @@
  *
  * Réception des webhooks Fapshi.
  * Thin controller : body brut → signature → délégation au WebhookService.
+ * Après traitement réussi : envoie l'email de confirmation.
  *
  * CRITIQUE : le body est lu en texte brut (request.text()) pour permettre
  * la vérification HMAC. Ne JAMAIS parser le JSON avant l'envoi au service.
@@ -16,6 +17,10 @@ import { PaymentOrderRepository } from "@/features/payments/repositories/order.r
 import { CommissionRepository } from "@/features/payments/repositories/commission.repository";
 import { ProviderFactory } from "@/features/payments/adapters/provider-factory";
 import { PaymentError } from "@/features/payments/errors/payment.errors";
+import { mailService } from "@/server/emails/mail.service";
+import { GuestCheckoutService } from "@/features/guest-checkout/guest-checkout.service";
+import { GuestOrderRepository } from "@/features/guest-checkout/guest-order.repository";
+import { PaymentService } from "@/features/payments/services/payment.service";
 
 // ---------------------------------------------------------------------------
 // Initialisation
@@ -24,6 +29,7 @@ import { PaymentError } from "@/features/payments/errors/payment.errors";
 const transactionRepo = new TransactionRepository();
 const orderRepo = new PaymentOrderRepository();
 const commissionRepo = new CommissionRepository();
+const guestOrderRepo = new GuestOrderRepository();
 
 const providerFactory = new ProviderFactory({
   defaultProvider: "FAPSHI",
@@ -36,7 +42,15 @@ const providerFactory = new ProviderFactory({
   },
 });
 
+const paymentService = new PaymentService(
+  transactionRepo,
+  orderRepo,
+  providerFactory.getDefaultProvider()
+);
+
 const commissionService = new CommissionService(commissionRepo, orderRepo);
+
+const guestCheckoutService = new GuestCheckoutService(guestOrderRepo, paymentService);
 
 const webhookService = new WebhookService(
   transactionRepo,
@@ -64,12 +78,41 @@ export async function POST(request: Request) {
   try {
     const result = await webhookService.process(rawBody, signature, remoteIp);
 
+    // 5. Après traitement réussi → envoyer l'email de confirmation
+    if (result.processed && result.orderStatus === "PAID" && result.orderId) {
+      try {
+        const order = await guestOrderRepo.findById(result.orderId);
+        if (order) {
+          if (order.ownerType === "GUEST" && order.guestEmail) {
+            // Générer les liens de téléchargement pour l'invité
+            const downloadLinks = await guestCheckoutService.generateDownloadLinks(order);
+            await mailService.sendGuestOrderConfirmation(
+              order.guestEmail,
+              {
+                number: order.number,
+                totalAmount: Number(order.totalAmount),
+                items: order.items.map((item) => ({
+                  titleSnapshot: item.titleSnapshot,
+                  yearSnapshot: item.yearSnapshot,
+                  price: Number(item.price),
+                })),
+              },
+              downloadLinks
+            );
+          } else {
+            // Utilisateur connecté
+            await mailService.sendOrderConfirmation(result.orderId);
+          }
+        }
+      } catch (emailError) {
+        console.error("[webhook] Erreur envoi email confirmation:", emailError);
+        // Ne pas faire échouer le webhook pour une erreur d'email
+      }
+    }
+
     return NextResponse.json({ success: true, data: result }, { status: 200 });
   } catch (error) {
     if (error instanceof PaymentError) {
-      // Même en cas d'erreur, on répond 200 à Fapshi pour éviter
-      // qu'il ne renvoie le webhook indéfiniment.
-      // L'erreur est journalisée côté service.
       console.error(`[webhook] Erreur traitée: ${error.code} — ${error.message}`);
       return NextResponse.json(
         { success: false, error: { code: error.code, message: error.message } },

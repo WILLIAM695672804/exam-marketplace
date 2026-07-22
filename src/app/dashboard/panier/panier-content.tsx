@@ -21,6 +21,7 @@ export function PanierContent() {
   const [items, setItems] = useState<CartItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [isPaying, setIsPaying] = useState(false);
+  const [paiementErreur, setPaiementErreur] = useState("");
 
   useEffect(() => {
     async function load() {
@@ -162,9 +163,15 @@ export function PanierContent() {
               <span className="font-headline-sm text-primary">Total</span>
               <span className="font-headline-sm text-primary">{formatPrice(total)}</span>
             </div>
+            {paiementErreur && (
+              <p className="font-body-sm text-error bg-error/10 p-3 border border-error/20 mb-4">
+                {paiementErreur}
+              </p>
+            )}
             <button
               onClick={async () => {
                 if (isPaying) return;
+                setPaiementErreur("");
                 setIsPaying(true);
                 try {
                   // 1. Créer la commande depuis le panier
@@ -192,7 +199,16 @@ export function PanierContent() {
 
                   const { data } = await payRes.json();
 
-                  // 3. Redirection vers Fapshi
+                  // 3. Redirection vers Fapshi ou gestion de l'échec
+                  if (data?.status === "FAILED") {
+                    const raison = data?.errorMessage || "";
+                    setPaiementErreur(
+                      `Le paiement a été refusé.${raison ? ` (${raison})` : ""}`
+                    );
+                    setIsPaying(false);
+                    return;
+                  }
+
                   if (data?.paymentUrl) {
                     window.location.href = data.paymentUrl;
                   } else {

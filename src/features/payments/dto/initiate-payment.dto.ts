@@ -26,6 +26,8 @@ export interface InitiatePaymentResponse {
   readonly provider: string;
   /** URL de redirection (Initiate Pay). Absent en Direct Pay. */
   readonly paymentUrl?: string;
+  /** Message d'erreur (présent uniquement si status === "FAILED"). */
+  readonly errorMessage?: string;
 }
 
 // ---------------------------------------------------------------------------

@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { formatPrice } from "@/lib/utils";
+import { GuestCheckoutModal } from "@/components/checkout/guest-checkout-modal";
 
 interface ExamDetail {
   id: string;
@@ -29,6 +30,8 @@ export default function EpreuveDetailPage() {
   const [exam, setExam] = useState<ExamDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isConnected, setIsConnected] = useState(false);
+  const [guestModalOpen, setGuestModalOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState<"exam" | "correction">("exam");
 
   useEffect(() => {
@@ -57,6 +60,7 @@ export default function EpreuveDetailPage() {
           const session = await res.json();
           const roles: string[] = session?.user?.roles ?? [];
           setIsAdmin(roles.includes("ADMIN"));
+          setIsConnected(!!session?.user);
         }
       } catch {
         // Non connecte
@@ -91,6 +95,14 @@ export default function EpreuveDetailPage() {
 
   async function handleBuyNow() {
     if (!exam) return;
+
+    // Si non connecté → ouvrir le modal invité
+    if (!isConnected) {
+      setGuestModalOpen(true);
+      return;
+    }
+
+    // Connecté → comportement actuel (panier → checkout)
     const res = await fetch("/api/cart", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -276,6 +288,19 @@ export default function EpreuveDetailPage() {
           catalogue
         </Link>
       </div>
+
+      <GuestCheckoutModal
+        open={guestModalOpen}
+        examPaperId={exam.id}
+        examTitle={exam.title}
+        examPrice={
+          selectedOption === "correction" && exam.priceWithCorrection
+            ? exam.priceWithCorrection
+            : exam.price
+        }
+        withCorrection={selectedOption === "correction"}
+        onClose={() => setGuestModalOpen(false)}
+      />
     </div>
   );
 }

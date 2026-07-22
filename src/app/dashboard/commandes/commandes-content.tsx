@@ -69,6 +69,15 @@ export function CommandesContent() {
         return;
       }
 
+      // Paiement refusé par le provider
+      if (data.data?.status === "FAILED") {
+        const raison = data.data?.errorMessage || "";
+        setAlertMsg(
+          `Le paiement a été refusé.${raison ? ` (${raison})` : ""}`
+        );
+        return;
+      }
+
       // Rediriger vers l'URL de paiement Fapshi (mode INITIATE)
       if (data.data?.paymentUrl) {
         window.location.assign(data.data.paymentUrl);

@@ -6,6 +6,8 @@ import { useRouter } from "next/navigation";
 export function PublierContent({ isAdmin = false }: { isAdmin?: boolean }) {
   const [hasCorrection, setHasCorrection] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [uploadingPaper, setUploadingPaper] = useState(false);
+  const [uploadingCorrection, setUploadingCorrection] = useState(false);
   const [paperFileId, setPaperFileId] = useState<string | null>(null);
   const [correctionFileId, setCorrectionFileId] = useState<string | null>(null);
   const [categories, setCategories] = useState<{ id: string; name: string }[]>([]);
@@ -305,21 +307,42 @@ export function PublierContent({ isAdmin = false }: { isAdmin?: boolean }) {
                   <p className="font-label-caps text-label-caps text-on-surface-variant uppercase mb-4">
                     Fichier de l&apos;epreuve
                   </p>
-                  <label className="border-2 border-dashed border-outline-variant hover:border-primary h-40 flex flex-col items-center justify-center cursor-pointer bg-surface-container-lowest transition-colors">
-                    <span className="material-symbols-outlined text-4xl text-outline mb-2">
-                      picture_as_pdf
-                    </span>
-                    <p className="font-body-sm text-primary font-medium">
-                      {paperFileId ? "Fichier uploade" : "Cliquez pour uploader le PDF"}
-                    </p>
+                  <label className={`border-2 border-dashed h-40 flex flex-col items-center justify-center cursor-pointer bg-surface-container-lowest transition-colors ${uploadingPaper ? "border-primary pointer-events-none" : paperFileId ? "border-green-600 hover:border-primary" : "border-outline-variant hover:border-primary"}`}>
+                    {uploadingPaper ? (
+                      <>
+                        <span className="material-symbols-outlined text-4xl text-primary mb-2 animate-spin">
+                          progress_activity
+                        </span>
+                        <p className="font-body-sm text-primary font-medium">
+                          Televersement en cours...
+                        </p>
+                      </>
+                    ) : (
+                      <>
+                        <span className="material-symbols-outlined text-4xl text-outline mb-2">
+                          {paperFileId ? "check_circle" : "picture_as_pdf"}
+                        </span>
+                        <p className={`font-body-sm font-medium ${paperFileId ? "text-green-600" : "text-primary"}`}>
+                          {paperFileId ? "Fichier uploade" : "Cliquez pour uploader le PDF"}
+                        </p>
+                      </>
+                    )}
                     <input
                       type="file"
                       accept=".pdf"
                       className="hidden"
+                      disabled={uploadingPaper}
                       onChange={async (e) => {
                         const f = e.target.files?.[0];
                         if (f) {
-                          setPaperFileId(await uploadFile(f));
+                          setUploadingPaper(true);
+                          try {
+                            setPaperFileId(await uploadFile(f));
+                          } catch {
+                            // erreur silencieuse, l'utilisateur reessayera
+                          } finally {
+                            setUploadingPaper(false);
+                          }
                         }
                       }}
                     />
@@ -374,25 +397,45 @@ export function PublierContent({ isAdmin = false }: { isAdmin?: boolean }) {
                       Fichier du corrige
                     </p>
                     <label
-                      className={`border-2 border-dashed border-outline-variant h-40 flex flex-col items-center justify-center bg-surface-container-lowest transition-colors ${hasCorrection ? "cursor-pointer hover:border-primary" : "cursor-not-allowed"}`}
+                      className={`border-2 border-dashed h-40 flex flex-col items-center justify-center bg-surface-container-lowest transition-colors ${!hasCorrection ? "cursor-not-allowed" : uploadingCorrection ? "border-primary pointer-events-none" : correctionFileId ? "border-green-600 cursor-pointer hover:border-primary" : "border-outline-variant cursor-pointer hover:border-primary"}`}
                     >
-                      <span className="material-symbols-outlined text-4xl text-outline mb-2">
-                        task
-                      </span>
-                      <p
-                        className={`font-body-sm font-medium ${hasCorrection ? "text-primary" : "text-outline"}`}
-                      >
-                        {correctionFileId ? "Fichier uploade" : "Uploader le corrige PDF"}
-                      </p>
+                      {uploadingCorrection ? (
+                        <>
+                          <span className="material-symbols-outlined text-4xl text-primary mb-2 animate-spin">
+                            progress_activity
+                          </span>
+                          <p className="font-body-sm text-primary font-medium">
+                            Televersement en cours...
+                          </p>
+                        </>
+                      ) : (
+                        <>
+                          <span className="material-symbols-outlined text-4xl text-outline mb-2">
+                            {correctionFileId ? "check_circle" : "task"}
+                          </span>
+                          <p
+                            className={`font-body-sm font-medium ${!hasCorrection ? "text-outline" : correctionFileId ? "text-green-600" : "text-primary"}`}
+                          >
+                            {correctionFileId ? "Fichier uploade" : "Uploader le corrige PDF"}
+                          </p>
+                        </>
+                      )}
                       <input
                         type="file"
                         accept=".pdf"
                         className="hidden"
-                        disabled={!hasCorrection}
+                        disabled={!hasCorrection || uploadingCorrection}
                         onChange={async (e) => {
                           const f = e.target.files?.[0];
                           if (f) {
-                            setCorrectionFileId(await uploadFile(f));
+                            setUploadingCorrection(true);
+                            try {
+                              setCorrectionFileId(await uploadFile(f));
+                            } catch {
+                              // erreur silencieuse
+                            } finally {
+                              setUploadingCorrection(false);
+                            }
                           }
                         }}
                       />
@@ -413,11 +456,22 @@ export function PublierContent({ isAdmin = false }: { isAdmin?: boolean }) {
             </button>
             <button
               type="submit"
-              disabled={uploading || !paperFileId}
+              disabled={uploading || !paperFileId || uploadingPaper || uploadingCorrection}
               className="w-full sm:w-auto bg-primary text-on-primary px-10 py-4 font-label-caps text-label-caps uppercase hover:bg-inverse-surface transition-colors disabled:opacity-70 flex items-center justify-center gap-2"
             >
-              {uploading ? "Publication..." : "Publier l'epreuve"}
-              <span className="material-symbols-outlined text-sm">arrow_forward</span>
+              {uploading ? (
+                <>
+                  <span className="material-symbols-outlined text-[18px] animate-spin">
+                    progress_activity
+                  </span>
+                  Publication en cours...
+                </>
+              ) : (
+                <>
+                  Publier l&apos;epreuve
+                  <span className="material-symbols-outlined text-sm">arrow_forward</span>
+                </>
+              )}
             </button>
           </div>
         </form>

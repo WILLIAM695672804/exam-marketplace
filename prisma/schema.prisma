@@ -260,19 +260,22 @@ model CartItem {
 }
 
 model Order {
-  id           String        @id @default(uuid())
-  number       String        @unique
-  userId       String
-  totalAmount  Decimal       @db.Decimal(10, 2)
-  status       OrderStatus   @default(PENDING)
+  id           String         @id @default(uuid())
+  number       String         @unique
+  ownerType    OrderOwnerType @default(USER)
+  userId       String?
+  guestEmail   String?
+  totalAmount  Decimal        @db.Decimal(10, 2)
+  status       OrderStatus    @default(PENDING)
   paidAt       DateTime?
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
   items        OrderItem[]
-  user         User          @relation(fields: [userId], references: [id])
+  user         User?          @relation(fields: [userId], references: [id])
   transactions Transaction[]
 
   @@index([userId])
+  @@index([guestEmail])
   @@index([status])
   @@index([number])
   @@map("orders")
@@ -354,12 +357,12 @@ model Commission {
 model Download {
   id          String    @id @default(uuid())
   orderItemId String
-  userId      String
+  userId      String?
   ipAddress   String?
   userAgent   String?
   createdAt   DateTime  @default(now())
   orderItem   OrderItem @relation(fields: [orderItemId], references: [id], onDelete: Cascade)
-  user        User      @relation(fields: [userId], references: [id])
+  user        User?     @relation(fields: [userId], references: [id])
 
   @@index([orderItemId])
   @@index([userId])
@@ -434,6 +437,11 @@ enum ExamPaperStatus {
   DRAFT
   PUBLISHED
   MASKED
+}
+
+enum OrderOwnerType {
+  USER
+  GUEST
 }
 
 enum OrderStatus {

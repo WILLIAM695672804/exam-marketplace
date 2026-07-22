@@ -47,7 +47,7 @@ export const orderRepository = {
     });
   },
 
-  async createFromCart(userId: string) {
+  async createFromCart(userId: string, ownerType: "USER" | "GUEST" = "USER") {
     const cartItems = await prisma.cartItem.findMany({
       where: { userId },
       include: { examPaper: true },
@@ -68,6 +68,7 @@ export const orderRepository = {
     const order = await prisma.order.create({
       data: {
         number: this.generateNumber(),
+        ownerType,
         userId,
         totalAmount,
         items: {

@@ -7,8 +7,13 @@ const envSchema = z.object({
   // Auth.js
   AUTH_SECRET: z.string().min(1),
 
-  // Emails
-  RESEND_API_KEY: z.string().optional(),
+  // Emails (SMTP / Nodemailer)
+  SMTP_HOST: z.string(),
+  SMTP_PORT: z.coerce.number().int(),
+  SMTP_SECURE: z.coerce.boolean().default(true),
+  SMTP_USER: z.string().email(),
+  SMTP_PASSWORD: z.string(),
+  MAIL_FROM: z.string().default('"Muppad" <epreuvesconcours@epreuvesconcours.moncoursier.org>'),
 
   // NotchPay (déprécié)
   NOTCHPAY_API_KEY: z.string().optional(),

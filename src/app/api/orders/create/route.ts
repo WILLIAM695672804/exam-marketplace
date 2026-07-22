@@ -10,7 +10,7 @@ export async function POST() {
   }
 
   try {
-    const order = await orderRepository.createFromCart(session.user.id);
+    const order = await orderRepository.createFromCart(session.user.id, "USER");
     return NextResponse.json(serializeBigInt(order));
   } catch (error) {
     return NextResponse.json(

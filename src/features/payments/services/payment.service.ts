@@ -23,6 +23,7 @@ import { PaymentError } from "../errors/payment.errors";
 import type { IPaymentProvider } from "../adapters/payment-provider.interface";
 import type { TransactionRepository } from "../repositories/transaction.repository";
 import type { PaymentOrderRepository } from "../repositories/order.repository";
+import type { PaymentCustomer } from "../types/payment-customer";
 
 // ---------------------------------------------------------------------------
 // Service
@@ -43,14 +44,14 @@ export class PaymentService {
    * Initie un paiement pour une commande.
    *
    * @param request Données envoyées par le frontend (orderId + idempotencyKey).
-   * @param userId ID de l'utilisateur connecté.
+   * @param customer Client effectuant le paiement (utilisateur connecté ou invité).
    * @param ipAddress IP de l'utilisateur (pour audit).
    * @param userAgent User-Agent de l'utilisateur (pour audit).
    * @returns DTO de réponse (transactionId + status).
    */
   async initiate(
     request: InitiatePaymentRequest,
-    userId: string,
+    customer: PaymentCustomer,
     ipAddress?: string,
     userAgent?: string
   ): Promise<InitiatePaymentResponse> {
@@ -64,7 +65,9 @@ export class PaymentService {
     }
 
     // 3. Vérifications d'éligibilité (guards)
-    this.guardOrderBelongsToUser(order.userId, userId);
+    if (customer.ownerType === "USER" && customer.userId) {
+      this.guardOrderBelongsToUser(order.userId ?? "", customer.userId);
+    }
     this.guardOrderIsPending(order.status);
     this.guardAmountIsPositive(Number(order.totalAmount));
 
@@ -96,23 +99,16 @@ export class PaymentService {
 
     // 7. Appel au provider via l'adapter
     try {
-      const user = order.user as {
-        email: string;
-        phone?: string | null;
-        firstName?: string;
-        lastName?: string;
-      };
-
       const providerResponse = await this.paymentProvider.initiatePayment({
         amount: Number(order.totalAmount),
         currency: "XAF",
         reference: order.number,
-        email: user.email,
-        phone: user.phone ?? "",
-        name: user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : undefined,
+        email: customer.email,
+        phone: customer.phone ?? "",
+        name: customer.name,
         metadata: {
           orderId: order.id,
-          userId,
+          userId: customer.userId ?? customer.email,
           idempotencyKey: input.idempotencyKey,
         },
       });
@@ -146,6 +142,7 @@ export class PaymentService {
         transactionId: transaction.id,
         status: "FAILED",
         provider: this.paymentProvider.providerName,
+        errorMessage,
       };
     }
   }
