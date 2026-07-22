@@ -57,13 +57,10 @@ function buildConfig(): PaymentModuleConfig {
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 
-  const defaultBaseUrl =
-    environment === "production" ? "https://live.fapshi.com" : "https://sandbox.fapshi.com";
-
   const fapshi: FapshiConfig = {
     apiKey: process.env.FAPSHI_API_KEY ?? "",
     apiUser: readString("FAPSHI_API_USER", ""),
-    baseUrl: readString("FAPSHI_BASE_URL", defaultBaseUrl),
+    baseUrl: readString("FAPSHI_BASE_URL", ""),
     webhookSecret: readString("FAPSHI_WEBHOOK_SECRET", ""),
     timeoutMs: Number(process.env.FAPSHI_TIMEOUT_MS ?? 15_000),
   };

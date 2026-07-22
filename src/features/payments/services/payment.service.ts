@@ -103,8 +103,6 @@ export class PaymentService {
         lastName?: string;
       };
 
-      const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
-
       const providerResponse = await this.paymentProvider.initiatePayment({
         amount: Number(order.totalAmount),
         currency: "XAF",
@@ -112,7 +110,6 @@ export class PaymentService {
         email: user.email,
         phone: user.phone ?? "",
         name: user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : undefined,
-        redirectUrl: `${appUrl}/dashboard/commandes`,
         metadata: {
           orderId: order.id,
           userId,
