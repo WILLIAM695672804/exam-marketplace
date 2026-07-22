@@ -27,6 +27,7 @@ const providerFactory = new ProviderFactory({
     apiUser: process.env.FAPSHI_API_USER ?? "",
     apiKey: process.env.FAPSHI_API_KEY ?? "",
     webhookSecret: process.env.FAPSHI_WEBHOOK_SECRET ?? "",
+    baseUrl: process.env.FAPSHI_BASE_URL ?? "",
   },
 });
 

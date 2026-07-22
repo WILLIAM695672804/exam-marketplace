@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { formatPrice } from "@/lib/utils";
-import { PaymentModal } from "@/components/ui/payment-modal";
 
 interface CartItem {
   id: string;
@@ -22,10 +21,6 @@ export function PanierContent() {
   const [items, setItems] = useState<CartItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [isPaying, setIsPaying] = useState(false);
-  const [paymentModal, setPaymentModal] = useState<{
-    paymentUrl: string;
-    orderId: string;
-  } | null>(null);
 
   useEffect(() => {
     async function load() {
@@ -197,9 +192,9 @@ export function PanierContent() {
 
                   const { data } = await payRes.json();
 
-                  // 3. Modal de paiement ou redirection
+                  // 3. Redirection vers Fapshi
                   if (data?.paymentUrl) {
-                    setPaymentModal({ paymentUrl: data.paymentUrl, orderId: order.id });
+                    window.location.href = data.paymentUrl;
                   } else {
                     window.location.href = "/dashboard/commandes";
                   }
@@ -216,21 +211,6 @@ export function PanierContent() {
         </div>
       )}
 
-      {/* Modal de paiement Fapshi */}
-      {paymentModal && (
-        <PaymentModal
-          paymentUrl={paymentModal.paymentUrl}
-          orderId={paymentModal.orderId}
-          onClose={() => {
-            setPaymentModal(null);
-            setIsPaying(false);
-          }}
-          onSuccess={() => {
-            setPaymentModal(null);
-            window.location.href = "/dashboard/commandes";
-          }}
-        />
-      )}
     </div>
   );
 }
