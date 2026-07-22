@@ -71,7 +71,7 @@ export function CommandesContent() {
 
       // Rediriger vers l'URL de paiement Fapshi (mode INITIATE)
       if (data.data?.paymentUrl) {
-        window.location.href = data.data.paymentUrl;
+        window.location.assign(data.data.paymentUrl);
         return;
       }
 
