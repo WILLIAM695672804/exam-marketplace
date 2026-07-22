@@ -79,18 +79,18 @@ jobs:
         run: tar -tzf deploy.tar.gz > /dev/null
 
       # (Optionnel) Vérification de l’environnement serveur (à décommenter pour le premier déploiement)
-      # - name: Verify server environment
-      #   uses: appleboy/ssh-action@v1.2.0
-      #   with:
-      #     host: ${{ secrets.SSH_HOST }}
-      #     username: ${{ secrets.SSH_USER }}
-      #     key: ${{ secrets.SSH_PRIVATE_KEY }}
-      #     port: ${{ secrets.SSH_PORT }}
-      #     script: |
-      #       node --version
-      #       npm --version
-      #       npx --version
-      #       rsync --version
+      - name: Verify server environment
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            node --version
+            npm --version
+            npx --version
+            rsync --version
 
       - name: Copy files to server
         uses: appleboy/scp-action@v0.1.7
