@@ -32,6 +32,7 @@ export function CommandesContent() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [alertMsg, setAlertMsg] = useState<string | null>(null);
+  const [payingOrderId, setPayingOrderId] = useState<string | null>(null);
 
   useEffect(() => {
     async function load() {
@@ -50,6 +51,38 @@ export function CommandesContent() {
     }
     load();
   }, []);
+
+  async function handlePay(orderId: string) {
+    setPayingOrderId(orderId);
+    try {
+      const idempotencyKey = crypto.randomUUID();
+      const res = await fetch("/api/payments/initiate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ orderId, idempotencyKey }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        setAlertMsg(data.error?.message || "Erreur lors de l'initiation du paiement.");
+        return;
+      }
+
+      // Rediriger vers l'URL de paiement Fapshi (mode INITIATE)
+      if (data.data?.paymentUrl) {
+        window.location.href = data.data.paymentUrl;
+        return;
+      }
+
+      // Mode DIRECT : le paiement a été traité immédiatement, rafraîchir la page
+      window.location.reload();
+    } catch {
+      setAlertMsg("Impossible de contacter le service de paiement.");
+    } finally {
+      setPayingOrderId(null);
+    }
+  }
 
   async function handleDownload(orderItemId: string, type: string) {
     const res = await fetch(`/api/download?orderItemId=${orderItemId}&type=${type}`);
@@ -126,8 +159,12 @@ export function CommandesContent() {
                   <span className="font-headline-sm text-headline-sm text-primary">
                     {formatPrice(order.totalAmount)}
                   </span>
-                  <button className="py-2 px-6 bg-primary text-on-primary font-label-caps text-label-caps uppercase hover:bg-inverse-surface transition-colors">
-                    Payer maintenant
+                  <button
+                    onClick={() => handlePay(order.id)}
+                    disabled={payingOrderId === order.id}
+                    className="py-2 px-6 bg-primary text-on-primary font-label-caps text-label-caps uppercase hover:bg-inverse-surface transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {payingOrderId === order.id ? "Paiement en cours..." : "Payer maintenant"}
                   </button>
                 </div>
               </div>
