@@ -54,6 +54,10 @@ jobs:
           NOTCHPAY_API_KEY: ${{ secrets.NOTCHPAY_API_KEY }}
           NOTCHPAY_API_SECRET: ${{ secrets.NOTCHPAY_API_SECRET }}
           NEXT_PUBLIC_APP_URL: ${{ vars.NEXT_PUBLIC_APP_URL || 'http://localhost:3000' }}
+          SMTP_HOST: ${{ secrets.SMTP_HOST || 'localhost' }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT || '587' }}
+          SMTP_USER: ${{ secrets.SMTP_USER || 'dummy@dummy.com' }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD || 'dummy' }}
 
       - name: Verify Next.js build
         run: test -f .next/BUILD_ID
