@@ -210,7 +210,6 @@ export function PanierContent() {
           </div>
         </div>
       )}
-
     </div>
   );
 }
