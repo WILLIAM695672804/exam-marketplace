@@ -307,7 +307,9 @@ export function PublierContent({ isAdmin = false }: { isAdmin?: boolean }) {
                   <p className="font-label-caps text-label-caps text-on-surface-variant uppercase mb-4">
                     Fichier de l&apos;epreuve
                   </p>
-                  <label className={`border-2 border-dashed h-40 flex flex-col items-center justify-center cursor-pointer bg-surface-container-lowest transition-colors ${uploadingPaper ? "border-primary pointer-events-none" : paperFileId ? "border-green-600 hover:border-primary" : "border-outline-variant hover:border-primary"}`}>
+                  <label
+                    className={`border-2 border-dashed h-40 flex flex-col items-center justify-center cursor-pointer bg-surface-container-lowest transition-colors ${uploadingPaper ? "border-primary pointer-events-none" : paperFileId ? "border-green-600 hover:border-primary" : "border-outline-variant hover:border-primary"}`}
+                  >
                     {uploadingPaper ? (
                       <>
                         <span className="material-symbols-outlined text-4xl text-primary mb-2 animate-spin">
@@ -322,7 +324,9 @@ export function PublierContent({ isAdmin = false }: { isAdmin?: boolean }) {
                         <span className="material-symbols-outlined text-4xl text-outline mb-2">
                           {paperFileId ? "check_circle" : "picture_as_pdf"}
                         </span>
-                        <p className={`font-body-sm font-medium ${paperFileId ? "text-green-600" : "text-primary"}`}>
+                        <p
+                          className={`font-body-sm font-medium ${paperFileId ? "text-green-600" : "text-primary"}`}
+                        >
                           {paperFileId ? "Fichier uploade" : "Cliquez pour uploader le PDF"}
                         </p>
                       </>

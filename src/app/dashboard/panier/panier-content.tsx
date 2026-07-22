@@ -202,9 +202,7 @@ export function PanierContent() {
                   // 3. Redirection vers Fapshi ou gestion de l'échec
                   if (data?.status === "FAILED") {
                     const raison = data?.errorMessage || "";
-                    setPaiementErreur(
-                      `Le paiement a été refusé.${raison ? ` (${raison})` : ""}`
-                    );
+                    setPaiementErreur(`Le paiement a été refusé.${raison ? ` (${raison})` : ""}`);
                     setIsPaying(false);
                     return;
                   }

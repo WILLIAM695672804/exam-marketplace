@@ -90,9 +90,7 @@ function TelechargementContent() {
               check_circle
             </span>
             <h1 className="font-headline-lg text-primary mb-2">Paiement confirmé</h1>
-            <p className="font-body-md text-on-surface-variant mb-10">
-              Votre épreuve est prête.
-            </p>
+            <p className="font-body-md text-on-surface-variant mb-10">Votre épreuve est prête.</p>
           </>
         )}
 
@@ -131,12 +129,10 @@ function TelechargementContent() {
 
         {/* Upsell : création de compte */}
         <div className="bg-surface-container-lowest border border-outline-variant p-6">
-          <h2 className="font-headline-sm text-primary mb-2">
-            Créer un compte gratuit
-          </h2>
+          <h2 className="font-headline-sm text-primary mb-2">Créer un compte gratuit</h2>
           <p className="font-body-sm text-on-surface-variant mb-5">
-            Retrouvez tous vos achats et votre historique de téléchargement
-            en créant un compte. C&apos;est gratuit et instantané.
+            Retrouvez tous vos achats et votre historique de téléchargement en créant un compte.
+            C&apos;est gratuit et instantané.
           </p>
           <Link
             href="/inscription"

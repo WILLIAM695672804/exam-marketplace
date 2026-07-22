@@ -72,9 +72,7 @@ export function CommandesContent() {
       // Paiement refusé par le provider
       if (data.data?.status === "FAILED") {
         const raison = data.data?.errorMessage || "";
-        setAlertMsg(
-          `Le paiement a été refusé.${raison ? ` (${raison})` : ""}`
-        );
+        setAlertMsg(`Le paiement a été refusé.${raison ? ` (${raison})` : ""}`);
         return;
       }
 

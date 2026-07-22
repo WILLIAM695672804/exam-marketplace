@@ -151,7 +151,10 @@ export const mailService = {
           .join("\n"),
       });
     } catch (error) {
-      logger.error({ error, email, orderId: order.number }, "Erreur envoi email confirmation invité");
+      logger.error(
+        { error, email, orderId: order.number },
+        "Erreur envoi email confirmation invité"
+      );
     }
   },
 

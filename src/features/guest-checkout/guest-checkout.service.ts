@@ -48,11 +48,7 @@ export class GuestCheckoutService {
    * Crée une commande invité pour un achat direct.
    * Pas de panier : l'invité achète une épreuve immédiatement.
    */
-  async createOrder(input: {
-    examPaperId: string;
-    email: string;
-    withCorrection: boolean;
-  }) {
+  async createOrder(input: { examPaperId: string; email: string; withCorrection: boolean }) {
     return this.orderRepo.createGuestOrder(input);
   }
 
@@ -76,12 +72,7 @@ export class GuestCheckoutService {
       email,
     };
 
-    return this.paymentService.initiate(
-      { orderId, idempotencyKey },
-      customer,
-      ip,
-      ua
-    );
+    return this.paymentService.initiate({ orderId, idempotencyKey }, customer, ip, ua);
   }
 
   // -----------------------------------------------------------------------

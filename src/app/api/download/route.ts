@@ -42,10 +42,7 @@ export async function GET(req: Request) {
     return handleAuthenticatedDownload(orderItemId, type, req);
   }
 
-  return NextResponse.json(
-    { error: "Paramètre orderItemId ou token requis." },
-    { status: 400 }
-  );
+  return NextResponse.json({ error: "Paramètre orderItemId ou token requis." }, { status: 400 });
 }
 
 // ---------------------------------------------------------------------------
@@ -86,10 +83,7 @@ async function handleGuestDownload(token: string, req: Request) {
   // 1. Vérifier le jeton
   const payload = await verifyDownloadToken(token);
   if (!payload) {
-    return NextResponse.json(
-      { error: "Lien invalide ou expiré." },
-      { status: 403 }
-    );
+    return NextResponse.json({ error: "Lien invalide ou expiré." }, { status: 403 });
   }
 
   // 2. Récupérer l'OrderItem
@@ -140,7 +134,11 @@ async function serveFile(
     examPaper: {
       id: string;
       paperFile: { path: string; mimeType?: string | null; originalName?: string | null } | null;
-      correctionFile: { path: string; mimeType?: string | null; originalName?: string | null } | null;
+      correctionFile: {
+        path: string;
+        mimeType?: string | null;
+        originalName?: string | null;
+      } | null;
     };
     downloads: { id: string }[];
   },
@@ -162,10 +160,7 @@ async function serveFile(
   // Vérifier la limite de téléchargements
   const maxDownloads = 5;
   if (orderItem.downloads.length >= maxDownloads) {
-    return NextResponse.json(
-      { error: "Limite de téléchargements atteinte" },
-      { status: 429 }
-    );
+    return NextResponse.json({ error: "Limite de téléchargements atteinte" }, { status: 429 });
   }
 
   const buffer = await getFile(file.path);

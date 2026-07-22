@@ -66,9 +66,10 @@ export class GuestOrderRepository {
       throw new Error("Épreuve introuvable ou non disponible.");
     }
 
-    const price = input.withCorrection && examPaper.priceWithCorrection
-      ? examPaper.priceWithCorrection
-      : examPaper.price;
+    const price =
+      input.withCorrection && examPaper.priceWithCorrection
+        ? examPaper.priceWithCorrection
+        : examPaper.price;
 
     const order = await prisma.order.create({
       data: {

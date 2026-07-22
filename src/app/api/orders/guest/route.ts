@@ -21,19 +21,13 @@ export async function POST(req: Request) {
 
     // Validation basique
     if (!body.examPaperId || !body.email) {
-      return NextResponse.json(
-        { error: "examPaperId et email sont requis." },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "examPaperId et email sont requis." }, { status: 400 });
     }
 
     // Validation email simple
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(body.email)) {
-      return NextResponse.json(
-        { error: "Adresse email invalide." },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Adresse email invalide." }, { status: 400 });
     }
 
     const order = await guestOrderRepo.createGuestOrder({

@@ -94,9 +94,7 @@ export function GuestCheckoutModal({
       const paymentData = await paymentRes.json();
 
       if (!paymentRes.ok || !paymentData.success) {
-        throw new Error(
-          paymentData.error?.message || "Erreur lors de l'initiation du paiement."
-        );
+        throw new Error(paymentData.error?.message || "Erreur lors de l'initiation du paiement.");
       }
 
       // Étape 3 : Rediriger vers Fapshi ou afficher l'erreur
@@ -110,7 +108,9 @@ export function GuestCheckoutModal({
       if (paymentData.data?.paymentUrl) {
         window.location.href = paymentData.data.paymentUrl;
       } else {
-        throw new Error("Le service de paiement est momentanément indisponible. Réessayez dans quelques instants.");
+        throw new Error(
+          "Le service de paiement est momentanément indisponible. Réessayez dans quelques instants."
+        );
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Une erreur est survenue.");
